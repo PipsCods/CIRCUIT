@@ -3,6 +3,8 @@
 **A deterministic benchmark for measuring how much engineered context improves
 evidence-grounded citation retrieval.**
 
+[Visit the CIRCUIT landing page.](https://melodious-lolly-912b1c.netlify.app/)
+
 CIRCUIT tests a concrete claim:
 
 > A small language model with a carefully engineered operating context can match
