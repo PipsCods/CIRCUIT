@@ -12,6 +12,7 @@ from circuit import agent, config, contexts, doi  # noqa: E402
 
 
 CONFIGS = {
+    "N": (config.SMALL, contexts.NONE),
     "A": (config.SMALL, contexts.NAIVE),
     "B": (config.LARGE, contexts.NAIVE),
     "C": (config.SMALL, contexts.ENGINEERED),
@@ -93,16 +94,33 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("config", choices=sorted(CONFIGS))
     parser.add_argument("--workers", type=int, default=8)
+    parser.add_argument(
+        "--qid", action="append", default=None,
+        help="Run only these question ids (repeatable). Smoke-testing only — "
+             "a scored matrix must run the whole frozen set.")
     args = parser.parse_args()
 
     config_name = args.config.upper()
     model, context_factory = CONFIGS[config_name]
-    context = context_factory()
     questions = [
         json.loads(line)
         for line in (config.DATA / "questions.jsonl").read_text().splitlines()
         if line.strip()
     ]
+    # Validate the selection before any network work, so a mistyped id fails
+    # instantly instead of after schema fetch and OAuth.
+    if args.qid:
+        wanted = list(dict.fromkeys(args.qid))
+        by_id = {question["id"]: question for question in questions}
+        missing = [qid for qid in wanted if qid not in by_id]
+        if missing:
+            parser.error(f"unknown question ids: {', '.join(missing)}")
+        # Keep frozen-set order so a subset run is a slice, not a reordering.
+        selected = set(wanted)
+        questions = [q for q in questions if q["id"] in selected]
+        print(f"PARTIAL RUN: {len(questions)} of 25 questions — not a scoreable matrix")
+
+    context = context_factory()
     output = config.RUNS / config_name
     output.mkdir(parents=True, exist_ok=True)
 
@@ -125,11 +143,15 @@ def main():
                 f"tokens={trace['tokens_total']} cost=${trace['cost']:.6f}"
             )
 
+    # Only the questions this invocation ran — globbing the directory would fold
+    # in stale traces from an earlier run and misreport the tally.
     errors = [
-        path for path in output.glob("q*.json")
-        if json.loads(path.read_text()).get("error")
+        question["id"] for question in questions
+        if json.loads((output / f"{question['id']}.json").read_text()).get("error")
     ]
     print(f"Finished {config_name}: {len(questions) - len(errors)}/{len(questions)} runs")
+    if errors:
+        print(f"Errored: {', '.join(errors)}")
     return 1 if errors else 0
 
 

@@ -13,6 +13,14 @@ class Context:
     tools: list
 
 
+NO_TOOL_PROMPT = (
+    "You are a research assistant. Identify the five most influential papers "
+    "requested by the user, including each paper's DOI, title, and citation "
+    "count. Return only valid JSON with exactly this shape: "
+    '{"answer": "brief answer", "citations": [{"doi": "10.xxxx/...", '
+    '"title": "paper title", "citation_count": 0}]}.'
+)
+
 NAIVE_PROMPT = (
     "You are a research assistant with access to the OpenAIRE research graph. "
     "Use the provided tools to identify the five most influential papers requested "
@@ -181,5 +189,11 @@ def engineered():
     return Context("engineered", ENGINEERED_PROMPT, [search, influence])
 
 
+def none():
+    """Parametric-memory floor: same output contract, no tools at all."""
+    return Context("none", NO_TOOL_PROMPT, [])
+
+
+NONE = none
 NAIVE = naive
 ENGINEERED = engineered
