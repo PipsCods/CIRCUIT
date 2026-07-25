@@ -87,7 +87,7 @@ def main():
     ]
     gold = {question["id"]: question for question in questions}
     rows = []
-    for name in ("A", "B", "C", "D"):
+    for name in ("A", "B", "C", "D", "E", "F"):
         directory = config.RUNS / name
         if not directory.exists():
             continue

@@ -52,11 +52,12 @@ def c_key_anthropic():
 def c_prices():
     with urllib.request.urlopen("https://openrouter.ai/api/v1/models", timeout=60) as r:
         live = {m["id"]: m.get("pricing", {}) for m in json.load(r)["data"]}
-    drift, checked = [], 0
+    drift, checked, manual = [], 0, 0
     for model, p in config.PRICES.items():
         # Only OpenRouter-served models can be verified here. The Anthropic
-        # entry is list pricing and is maintained by hand.
+        # entries are list pricing and are maintained by hand.
         if config.PROVIDER.get(model) != "openrouter":
+            manual += 1
             continue
         if model not in live:
             raise RuntimeError(f"{model} not offered by OpenRouter any more")
@@ -67,7 +68,7 @@ def c_prices():
                 drift.append(f"{model}.{ours}: ours={p[ours]} live={got}")
     if drift:
         raise RuntimeError("update config.PRICES — " + "; ".join(drift))
-    return f"{checked} verified live, 1 manual (anthropic)"
+    return f"{checked} verified live, {manual} manual (anthropic)"
 
 
 @check("Gemma 4 responds")

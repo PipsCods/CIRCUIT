@@ -16,6 +16,8 @@ CONFIGS = {
     "B": (config.LARGE, contexts.NAIVE),
     "C": (config.SMALL, contexts.ENGINEERED),
     "D": (config.LARGE, contexts.ENGINEERED),
+    "E": (config.FABLE, contexts.NAIVE),
+    "F": (config.FABLE, contexts.ENGINEERED),
 }
 
 

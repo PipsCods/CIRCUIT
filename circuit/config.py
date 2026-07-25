@@ -49,16 +49,26 @@ ANTHROPIC_BASE_URL = DOTENV.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com
 
 SMALL = "google/gemma-4-26b-a4b-it"      # via OpenRouter
 LARGE = "claude-sonnet-4-6"              # via the Anthropic SDK
+FABLE = "claude-fable-5"                 # via the Anthropic SDK
 
-PROVIDER = {SMALL: "openrouter", LARGE: "anthropic"}
+PROVIDER = {
+    SMALL: "openrouter",
+    LARGE: "anthropic",
+    FABLE: "anthropic",
+}
 
 # USD per token. The OpenRouter entries are re-verified against the live models
-# endpoint by smoke.py; the Anthropic entry is list pricing and is checked by
+# endpoint by smoke.py; the Anthropic entries are list pricing and are checked by
 # hand. Cache reads/writes are not modelled — we do not use prompt caching.
 PRICES = {
     SMALL: {"in": 0.00000012, "out": 0.00000035},
     LARGE: {"in": 0.000003, "out": 0.000015},
+    FABLE: {"in": 0.000010, "out": 0.000050},
 }
+
+# Fable 5 has always-on adaptive thinking and rejects temperature values other
+# than 1.0. Omitting the parameter uses its only supported sampling behavior.
+NO_TEMPERATURE = {FABLE}
 
 SEED = 20260725
 

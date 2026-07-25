@@ -30,6 +30,7 @@ resolves or it does not — so the hallucination rate is a string lookup, not a 
 | ------------------ | ------------- | ------------------ |
 | Gemma 4 (26B-A4B)  | **A** floor   | **C** our product  |
 | Claude Sonnet 4.6  | **B** the bar | **D** headroom     |
+| Claude Fable 5     | **E** optional | **F** optional     |
 
 Target result: **C >= B on accuracy, at far below B's cost.** D shows the technique is
 not overfit to Gemma.
@@ -68,6 +69,11 @@ out loud in the pitch rather than letting a judge find it.
 
 `circuit/llm.py` hides the split: messages and tools are always authored in OpenAI shape
 and translated for Anthropic, so the runner never branches on provider.
+
+Fable 5 is an optional additional comparison, not part of the core A-D claim. Its API
+does not accept `temperature=0`, so the harness omits that unsupported parameter for
+configs E/F. It also preserves adaptive-thinking blocks across tool turns and reports
+classifier refusals as run errors rather than silently falling back to another model.
 
 ## Layout
 

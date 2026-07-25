@@ -16,9 +16,11 @@ class Context:
 NAIVE_PROMPT = (
     "You are a research assistant with access to the OpenAIRE research graph. "
     "Use the provided tools to identify the five most influential papers requested "
-    "by the user, including each paper's DOI, title, and citation count. Return only "
-    'valid JSON with exactly this shape: {"answer": "brief answer", "citations": '
-    '[{"doi": "10.xxxx/...", "title": "paper title", "citation_count": 0}]}.'
+    "by the user, including each paper's DOI, title, and citation count. Your entire "
+    "final response must be one raw JSON object with exactly this shape: "
+    '{"answer": "brief answer", "citations": [{"doi": "10.xxxx/...", '
+    '"title": "paper title", "citation_count": 0}]}. Do not add Markdown fences, '
+    "a preamble, headings, tables, notes, or any text before or after the JSON object."
 )
 
 ENGINEERED_PROMPT = """\

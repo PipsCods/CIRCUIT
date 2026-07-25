@@ -1,15 +1,17 @@
-"""Unified chat interface over two providers.
+"""Unified chat interface over OpenRouter and Anthropic.
 
-Gemma 4 goes through OpenRouter; Claude Sonnet 4.6 goes through the Anthropic
-SDK. Messages and tools are written once in OpenAI shape (the canonical form for
-this harness) and translated for Anthropic here, so the runner never branches on
-provider.
+Gemma 4 goes through OpenRouter; Claude Sonnet 4.6 and Claude Fable 5 go through
+the Anthropic SDK. Messages and tools are written once in OpenAI shape (the
+canonical form for this harness) and translated for Anthropic here, so the
+runner never branches on provider.
 
 Caveat we state openly in the writeup: the Anthropic API has no `seed`
 parameter, so Sonnet's determinism rests on temperature=0 alone, while Gemma is
 both seeded and temperature-0. Sonnet is the *baseline* being compared against,
 not the subject of the intervention, so this does not affect the claim — but it
-does mean Sonnet's numbers can move slightly between runs.
+does mean Sonnet's numbers can move slightly between runs. Fable 5 additionally
+does not support temperature=0, so the parameter is omitted for that optional
+model.
 """
 import json
 import urllib.error
@@ -27,6 +29,9 @@ class Reply:
     tokens_out: int = 0
     cost: float = 0.0
     raw: dict = field(default_factory=dict)
+    # Provider-native assistant content to carry unchanged into a follow-up
+    # turn. Fable 5 requires its adaptive-thinking blocks to be preserved.
+    provider_content: list = field(default_factory=list)
 
 
 def chat(model, messages, tools=None, temperature=0.0, max_tokens=2048,
@@ -112,7 +117,7 @@ def _parse_args(raw):
 
 
 # --------------------------------------------------------------------------- #
-# Anthropic (Claude Sonnet 4.6)
+# Anthropic (Claude Sonnet 4.6 and Claude Fable 5)
 # --------------------------------------------------------------------------- #
 
 _client = None
@@ -159,6 +164,14 @@ def _to_anthropic(messages, tools):
             continue
 
         if role == "assistant" and m.get("tool_calls"):
+            # Fable 5 requires thinking blocks to be passed back unchanged.
+            # Prefer the original Anthropic content when the preceding reply
+            # supplied it; reconstructed OpenAI-shaped blocks remain the
+            # fallback for Sonnet and caller-authored histories.
+            if m.get("_provider_content"):
+                out.append({"role": "assistant", "content": m["_provider_content"]})
+                continue
+
             blocks = []
             if m.get("content"):
                 blocks.append({"type": "text", "text": m["content"]})
@@ -192,9 +205,10 @@ def _anthropic(model, messages, tools, temperature, max_tokens, timeout):
         "model": model,
         "messages": msgs,
         "max_tokens": max_tokens,
-        "temperature": temperature,
         "timeout": timeout,
     }
+    if model not in config.NO_TEMPERATURE:
+        kwargs["temperature"] = temperature
     if system:
         kwargs["system"] = system
     if a_tools:
@@ -205,6 +219,12 @@ def _anthropic(model, messages, tools, temperature, max_tokens, timeout):
     except Exception as e:
         raise RuntimeError(f"Anthropic API: {type(e).__name__}: {str(e)[:400]}") from None
 
+    if resp.stop_reason == "refusal":
+        details = getattr(resp, "stop_details", None)
+        if hasattr(details, "model_dump"):
+            details = details.model_dump()
+        raise RuntimeError(f"Anthropic refusal: {details or 'no details returned'}")
+
     text_parts, calls = [], []
     for block in resp.content:
         if block.type == "text":
@@ -214,5 +234,10 @@ def _anthropic(model, messages, tools, temperature, max_tokens, timeout):
                           "args": block.input if isinstance(block.input, dict) else {}})
 
     ti, to = resp.usage.input_tokens, resp.usage.output_tokens
+    provider_content = [
+        block.model_dump() if hasattr(block, "model_dump") else block
+        for block in resp.content
+    ]
     return Reply("".join(text_parts), calls, ti, to,
-                 config.cost_usd(model, ti, to), resp.model_dump())
+                 config.cost_usd(model, ti, to), resp.model_dump(),
+                 provider_content)

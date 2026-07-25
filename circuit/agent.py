@@ -52,7 +52,7 @@ def run(model, context, question, max_turns=6):
                 "args": args,
             })
 
-        messages.append({
+        assistant_message = {
             "role": "assistant",
             "content": reply.text,
             "tool_calls": [{
@@ -63,7 +63,10 @@ def run(model, context, question, max_turns=6):
                     "arguments": json.dumps(call["args"]),
                 },
             } for call in normalized_calls],
-        })
+        }
+        if reply.provider_content:
+            assistant_message["_provider_content"] = reply.provider_content
+        messages.append(assistant_message)
 
         for call in normalized_calls:
             trace = {
