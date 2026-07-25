@@ -26,17 +26,24 @@ resolves or it does not — so the hallucination rate is a string lookup, not a 
 
 ## Experiment matrix
 
-|                    | Naive context | Engineered context |
-| ------------------ | ------------- | ------------------ |
-| Gemma 4 (26B-A4B)  | **A** floor   | **C** our product  |
-| Claude Sonnet 4.6  | **B** the bar | **D** headroom     |
-| Claude Fable 5     | **E** optional | **F** optional     |
+|                    | Naive context | Engineered context | Intrinsic only |
+| ------------------ | ------------- | ------------------ | -------------- |
+| Gemma 4 (26B-A4B)  | **A** floor   | **C** our product  | **G**           |
+| Claude Sonnet 4.6  | **B** the bar | **D** headroom     | **H**           |
+| Claude Fable 5     | **E** optional | **F** optional     | **I**           |
 
 Target result: **C >= B on accuracy, at far below B's cost.** D shows the technique is
 not overfit to Gemma.
 
 Config A/B must be a *fair* naive baseline — real out-of-the-box MCP tool descriptions
 plus a sensible one-paragraph prompt. Not a strawman. We say this out loud in the pitch.
+
+Configs G/H/I expose no tools and test only knowledge stored in each model. They use the
+same frozen questions, decoding parameters, raw JSON output contract, trace files, and
+deterministic scorer as the retrieval conditions. DOI resolution happens only after the
+answer is complete and is never returned to the model. Citation counts remain required
+output, but count accuracy is not scored because the frozen gold set contains DOI/title
+ground truth only. Zero-result call rate is N/A because no retrieval call is attempted.
 
 ## Metrics
 

@@ -13,22 +13,35 @@ class Context:
     tools: list
 
 
-NO_TOOL_PROMPT = (
-    "You are a research assistant. Identify the five most influential papers "
-    "requested by the user, including each paper's DOI, title, and citation "
-    "count. Return only valid JSON with exactly this shape: "
-    '{"answer": "brief answer", "citations": [{"doi": "10.xxxx/...", '
-    '"title": "paper title", "citation_count": 0}]}.'
-)
+OUTPUT_CONTRACT = """\
+OUTPUT CONTRACT
+A successful response must be one raw JSON object with exactly two top-level
+keys, "answer" and "citations". The citations array must contain exactly five
+distinct objects, each with exactly these keys:
+{"doi":"10.xxxx/...","title":"paper title","citation_count":0}
+Every DOI and title must be a non-empty string, and every citation_count must be
+a non-negative integer. Never emit null. Do not add Markdown fences, a preamble,
+headings, tables, notes, or any text before or after the JSON object.
+
+If five complete records remain impossible, return the same two top-level keys
+with an empty citations array and briefly explain the shortage in "answer".
+This is a safe abstention, not a successful five-citation response.\
+"""
+
+RETRIEVAL_EVIDENCE_RULES = """\
+EVIDENCE RULES
+Every DOI, title, and citation_count must be copied from successful OpenAIRE
+tool evidence in this conversation. Never fill a missing field from model
+memory. Skip records without a DOI and continue down the ranked results.\
+"""
 
 NAIVE_PROMPT = (
     "You are a research assistant with access to the OpenAIRE research graph. "
     "Use the provided tools to identify the five most influential papers requested "
-    "by the user, including each paper's DOI, title, and citation count. Your entire "
-    "final response must be one raw JSON object with exactly this shape: "
-    '{"answer": "brief answer", "citations": [{"doi": "10.xxxx/...", '
-    '"title": "paper title", "citation_count": 0}]}. Do not add Markdown fences, '
-    "a preamble, headings, tables, notes, or any text before or after the JSON object."
+    "by the user, including each paper's DOI, title, and citation count.\n\n"
+    + RETRIEVAL_EVIDENCE_RULES
+    + "\n\n"
+    + OUTPUT_CONTRACT
 )
 
 ENGINEERED_PROMPT = """\
@@ -39,22 +52,32 @@ RETRIEVAL PROCEDURE
 1. OpenAIRE combines plain query terms with AND: every extra term narrows the
 result set. Start with the topic's 2-3 essential keywords; never expand it with
 lists of synonyms.
-2. Route cheaply with detail="minimal". Prefer citationCount DESC for raw
-impact and influence class C3 for field/age-normalized impact.
-3. If a tool call returns zero results or an error, remove query terms and retry.
-Make at most two shorter-query retries. If evidence is still insufficient,
-return an empty citations list rather than guessing.
-4. Once a query works, request detail="standard" and select five records with
-DOI, title, and citation count. Never emit a DOI that did not appear in a tool
-result in this conversation.
+2. Search with page_size=10, detail="minimal", and citationCount DESC. Minimal
+results already contain DOI, title, and citation count; use them directly when
+at least five complete DOI-bearing records are available.
+3. Skip incomplete records and continue down the ranked results. If fewer than
+five complete records are available, remove query terms and retry. Make at most
+two shorter-query retries.
+4. Request detail="standard" only when a candidate has a DOI but another
+required field is missing. Never emit a DOI, title, or count that did not appear
+in a successful tool result in this conversation.
 
-OUTPUT CONTRACT
-Your entire final response must be one raw JSON object with exactly this shape:
-{"answer":"brief evidence-grounded answer","citations":[{"doi":"10.xxxx/...",
-"title":"paper title","citation_count":0}]}
-Use an integer citation_count. Do not add Markdown fences, a preamble, headings,
-tables, notes, or any text before or after the JSON object.\
-"""
+""" + RETRIEVAL_EVIDENCE_RULES + "\n\n" + OUTPUT_CONTRACT
+
+INTRINSIC_PROMPT = """\
+ROLE
+You are a research assistant answering only from knowledge stored in the model.
+You have no tools or external sources and must not claim to have searched,
+browsed, retrieved, or verified information.
+
+KNOWLEDGE-ONLY PROCEDURE
+Identify the five most influential papers requested by the user from intrinsic
+knowledge alone. Do not invent a DOI or title. If you cannot confidently recall
+five papers, return an empty citations array rather than guessing. Citation
+counts change over time and cannot be looked up in this condition, so provide
+your best integer estimate.
+
+""" + OUTPUT_CONTRACT
 
 _SCHEMA_CACHE = config.CACHE / "openaire_tool_schemas.json"
 _NAIVE_TOOL_NAMES = (config.T_SEARCH, config.T_INFLUENCE)
@@ -110,9 +133,10 @@ def engineered():
             "description": (
                 "Search OpenAIRE research products. Query terms use strict AND "
                 "logic: more terms produce fewer results, so begin with 2-3 "
-                "essential keywords and shorten a zero-result query. Use "
-                'detail="minimal" while routing, then detail="standard" for '
-                "records that may be cited."
+                "essential keywords and shorten a query that yields fewer than "
+                'five complete records. Use detail="minimal" directly when it '
+                "contains DOI, title, and citation count; request standard only "
+                "when a required field is missing."
             ),
             "parameters": {
                 "type": "object",
@@ -139,61 +163,23 @@ def engineered():
                         "type": "string",
                         "enum": ["minimal", "standard"],
                         "description": (
-                            "Use minimal to test/rank a query; standard only "
-                            "when collecting final citation evidence."
+                            "Use minimal for routing and final citations when DOI, "
+                            "title, and count are present; standard only to fill a "
+                            "missing required field."
                         ),
                     },
-                    "influence_class": {
-                        "type": "array",
-                        "items": {"type": "string", "enum": ["C3"]},
-                        "description": "Optional top-1% influence filter.",
-                    },
                 },
-                "required": ["query"],
+                "required": ["query", "page_size", "sort_by", "detail"],
             },
         },
     }
-    influence = {
-        "type": "function",
-        "function": {
-            "name": config.T_INFLUENCE,
-            "description": (
-                "Find field- and age-normalized influential OpenAIRE records. "
-                "C3 is the useful top-1% default; C1/C2 are often empty for "
-                "niche topics. Query terms use strict AND logic, so shorten a "
-                "zero-result query."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "influence_class": {
-                        "type": "string",
-                        "enum": ["C3"],
-                        "description": "Use C3 (top 1%).",
-                    },
-                    "query": {
-                        "type": "string",
-                        "description": "2-3 essential AND-combined keywords.",
-                    },
-                    "page_size": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 10,
-                        "description": "Number of results; use 10.",
-                    },
-                },
-                "required": ["influence_class", "query"],
-            },
-        },
-    }
-    return Context("engineered", ENGINEERED_PROMPT, [search, influence])
+    return Context("engineered", ENGINEERED_PROMPT, [search])
 
 
-def none():
-    """Parametric-memory floor: same output contract, no tools at all."""
-    return Context("none", NO_TOOL_PROMPT, [])
+def intrinsic():
+    return Context("intrinsic", INTRINSIC_PROMPT, [])
 
 
-NONE = none
 NAIVE = naive
 ENGINEERED = engineered
+INTRINSIC = intrinsic

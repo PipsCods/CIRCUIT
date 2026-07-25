@@ -13,7 +13,9 @@ does mean Sonnet's numbers can move slightly between runs. Fable 5 additionally
 does not support temperature=0, so the parameter is omitted for that optional
 model.
 """
+import http.client
 import json
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -32,6 +34,11 @@ class Reply:
     # Provider-native assistant content to carry unchanged into a follow-up
     # turn. Fable 5 requires its adaptive-thinking blocks to be preserved.
     provider_content: list = field(default_factory=list)
+    gateway: str = ""
+    actual_provider: str = ""
+    actual_model: str = ""
+    response_id: str = ""
+    transport_attempts: int = 1
 
 
 def chat(model, messages, tools=None, temperature=0.0, max_tokens=2048,
@@ -82,11 +89,28 @@ def _openrouter(model, messages, tools, temperature, max_tokens,
         },
         method="POST",
     )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            data = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"OpenRouter {e.code}: {e.read().decode()[:400]}") from None
+    data = None
+    attempts = 0
+    for attempts in range(1, config.TRANSPORT_MAX_ATTEMPTS + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                data = json.loads(r.read())
+            break
+        except urllib.error.HTTPError as e:
+            raise RuntimeError(
+                f"OpenRouter {e.code}: {e.read().decode()[:400]}"
+            ) from None
+        except (
+            urllib.error.URLError,
+            http.client.RemoteDisconnected,
+            TimeoutError,
+        ) as exc:
+            if attempts == config.TRANSPORT_MAX_ATTEMPTS:
+                raise RuntimeError(
+                    f"OpenRouter transport failed after {attempts} attempts: "
+                    f"{type(exc).__name__}: {exc}"
+                ) from None
+            time.sleep(config.TRANSPORT_RETRY_DELAYS[attempts - 1])
 
     if "choices" not in data:
         raise RuntimeError(f"OpenRouter returned no choices: {str(data)[:400]}")
@@ -103,8 +127,19 @@ def _openrouter(model, messages, tools, temperature, max_tokens,
 
     usage = data.get("usage") or {}
     ti, to = usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0)
-    return Reply(msg.get("content") or "", calls, ti, to,
-                 config.cost_usd(model, ti, to), data)
+    return Reply(
+        text=msg.get("content") or "",
+        tool_calls=calls,
+        tokens_in=ti,
+        tokens_out=to,
+        cost=config.cost_usd(model, ti, to),
+        raw=data,
+        gateway="openrouter",
+        actual_provider=data.get("provider") or "openrouter-unspecified",
+        actual_model=data.get("model") or model,
+        response_id=data.get("id") or "",
+        transport_attempts=attempts,
+    )
 
 
 def _parse_args(raw):
@@ -238,6 +273,17 @@ def _anthropic(model, messages, tools, temperature, max_tokens, timeout):
         block.model_dump() if hasattr(block, "model_dump") else block
         for block in resp.content
     ]
-    return Reply("".join(text_parts), calls, ti, to,
-                 config.cost_usd(model, ti, to), resp.model_dump(),
-                 provider_content)
+    raw = resp.model_dump()
+    return Reply(
+        text="".join(text_parts),
+        tool_calls=calls,
+        tokens_in=ti,
+        tokens_out=to,
+        cost=config.cost_usd(model, ti, to),
+        raw=raw,
+        provider_content=provider_content,
+        gateway="anthropic",
+        actual_provider="anthropic",
+        actual_model=raw.get("model") or model,
+        response_id=raw.get("id") or "",
+    )
