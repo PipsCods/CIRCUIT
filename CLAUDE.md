@@ -49,6 +49,10 @@ truth only. Zero-result call rate is N/A because no retrieval call is attempted.
 Fable 5's biology classifier refuses the frozen life-science question set. Config J is
 the direct Opus 4.8 intrinsic-only comparison used in the final four-arm G/A/C/J run.
 
+For readable terminal recordings, the equivalent CLI names are `gemma-no-tools` (G),
+`gemma-naive-mcp` (A), `gemma-engineered-mcp` (C), and `opus-no-tools` (J). Named runs
+use these labels in their artifact directories, manifests, progress output, and reports.
+
 ## Metrics
 
 All deterministic, all computed by `circuit/score.py`.

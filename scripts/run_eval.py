@@ -26,7 +26,26 @@ CONFIGS = {
     "I": (config.FABLE, contexts.INTRINSIC),
     "J": (config.OPUS, contexts.INTRINSIC),
 }
+CONFIG_ALIASES = {
+    "gemma-no-tools": "G",
+    "gemma-naive-mcp": "A",
+    "gemma-engineered-mcp": "C",
+    "opus-no-tools": "J",
+}
 RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+
+
+def resolve_config(value):
+    """Return the artifact label, model, and context factory for a CLI name."""
+    alias = value.lower()
+    if alias in CONFIG_ALIASES:
+        key = CONFIG_ALIASES[alias]
+        label = alias
+    else:
+        key = value.upper()
+        label = key
+    model, context_factory = CONFIGS[key]
+    return label, model, context_factory
 
 
 def question_text(topic):
@@ -190,7 +209,10 @@ def build_manifest(run_id, config_name, model, context, questions):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("config", choices=sorted(CONFIGS))
+    parser.add_argument(
+        "config",
+        choices=sorted([*CONFIGS, *CONFIG_ALIASES]),
+    )
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--run-id", default=None)
     parser.add_argument(
@@ -200,8 +222,7 @@ def main():
     )
     args = parser.parse_args()
 
-    config_name = args.config.upper()
-    model, context_factory = CONFIGS[config_name]
+    config_name, model, context_factory = resolve_config(args.config)
     context = context_factory()
     questions = [
         json.loads(line)

@@ -6,6 +6,30 @@ from scripts import run_eval, score
 
 
 class IntrinsicBaselineTest(unittest.TestCase):
+    def test_readable_cli_aliases_resolve_to_named_artifacts(self):
+        expected = {
+            "gemma-no-tools": (config.SMALL, contexts.INTRINSIC),
+            "gemma-naive-mcp": (config.SMALL, contexts.NAIVE),
+            "gemma-engineered-mcp": (config.SMALL, contexts.ENGINEERED),
+            "opus-no-tools": (config.OPUS, contexts.INTRINSIC),
+        }
+
+        for alias, (model, context_factory) in expected.items():
+            with self.subTest(alias=alias):
+                label, resolved_model, resolved_context = (
+                    run_eval.resolve_config(alias)
+                )
+                self.assertEqual(label, alias)
+                self.assertEqual(resolved_model, model)
+                self.assertIs(resolved_context, context_factory)
+
+    def test_letter_configs_remain_backward_compatible(self):
+        label, model, context_factory = run_eval.resolve_config("G")
+
+        self.assertEqual(label, "G")
+        self.assertEqual(model, config.SMALL)
+        self.assertIs(context_factory, contexts.INTRINSIC)
+
     def test_intrinsic_configs_cover_all_models(self):
         self.assertEqual(
             run_eval.CONFIGS["G"], (config.SMALL, contexts.INTRINSIC)
