@@ -71,6 +71,9 @@ PRICES = {
 NO_TEMPERATURE = {FABLE}
 
 SEED = 20260725
+TEMPERATURE = 0.0
+MAX_TOKENS = 2048
+MAX_TURNS = 6
 
 MCP_OPENAIRE = "https://openaire.mcp.alien.club/mcp"
 

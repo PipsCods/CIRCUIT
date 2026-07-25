@@ -91,32 +91,55 @@ class MCP:
         key = json.dumps([self.url, tool, args], sort_keys=True)
         return config.CACHE / "mcp" / f"{hashlib.sha256(key.encode()).hexdigest()}.json"
 
+    @staticmethod
+    def _decorate(out, path, cached):
+        result = dict(out)
+        if not result.get("ok"):
+            # A failed call has no result cardinality. Keeping this distinct
+            # prevents failures from being counted as successful empty searches.
+            result["n_results"] = None
+            result.setdefault("error_kind", "tool_error")
+        text = result.get("text")
+        if not isinstance(text, str):
+            text = str(text or "")
+            result["text"] = text
+        result["response_sha256"] = hashlib.sha256(text.encode()).hexdigest()
+        result["cache_key"] = path.stem
+        result["cached"] = cached
+        return result
+
     def call(self, tool: str, args: dict) -> dict:
-        """Call a tool. Returns {"ok","text","n_results","cached"}."""
+        """Call a tool with explicit success/error cardinality and provenance."""
         path = self._cache_path(tool, args)
         if self.use_cache and path.exists():
             out = json.loads(path.read_text())
-            out["cached"] = True
-            return out
+            return self._decorate(out, path, True)
 
         self.connect()
         r = self._rpc("tools/call", {"name": tool, "arguments": args})
         if "error" in r:
-            out = {"ok": False, "text": json.dumps(r["error"])[:2000], "n_results": 0}
+            out = {
+                "ok": False,
+                "text": json.dumps(r["error"])[:2000],
+                "n_results": None,
+                "error_kind": "mcp_error",
+            }
         else:
             res = r.get("result", {})
             text = "\n".join(
                 c.get("text", "") for c in res.get("content", [])
                 if c.get("type") == "text")
             ok = not res.get("isError", False)
-            # A failed call has zero results, never one. Counting an error string
-            # as a result silently turns "the tool broke" into "the tool found
-            # something", which would corrupt the zero-result metric.
-            out = {"ok": ok, "text": text, "n_results": _count_results(text) if ok else 0}
+            out = {
+                "ok": ok,
+                "text": text,
+                "n_results": _count_results(text) if ok else None,
+            }
+            if not ok:
+                out["error_kind"] = "tool_error"
 
         path.write_text(json.dumps(out))
-        out["cached"] = False
-        return out
+        return self._decorate(out, path, False)
 
 
 def _count_results(text: str) -> int:

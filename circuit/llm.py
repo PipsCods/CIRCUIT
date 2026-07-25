@@ -32,6 +32,10 @@ class Reply:
     # Provider-native assistant content to carry unchanged into a follow-up
     # turn. Fable 5 requires its adaptive-thinking blocks to be preserved.
     provider_content: list = field(default_factory=list)
+    gateway: str = ""
+    actual_provider: str = ""
+    actual_model: str = ""
+    response_id: str = ""
 
 
 def chat(model, messages, tools=None, temperature=0.0, max_tokens=2048,
@@ -103,8 +107,18 @@ def _openrouter(model, messages, tools, temperature, max_tokens,
 
     usage = data.get("usage") or {}
     ti, to = usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0)
-    return Reply(msg.get("content") or "", calls, ti, to,
-                 config.cost_usd(model, ti, to), data)
+    return Reply(
+        text=msg.get("content") or "",
+        tool_calls=calls,
+        tokens_in=ti,
+        tokens_out=to,
+        cost=config.cost_usd(model, ti, to),
+        raw=data,
+        gateway="openrouter",
+        actual_provider=data.get("provider") or "openrouter-unspecified",
+        actual_model=data.get("model") or model,
+        response_id=data.get("id") or "",
+    )
 
 
 def _parse_args(raw):
@@ -238,6 +252,17 @@ def _anthropic(model, messages, tools, temperature, max_tokens, timeout):
         block.model_dump() if hasattr(block, "model_dump") else block
         for block in resp.content
     ]
-    return Reply("".join(text_parts), calls, ti, to,
-                 config.cost_usd(model, ti, to), resp.model_dump(),
-                 provider_content)
+    raw = resp.model_dump()
+    return Reply(
+        text="".join(text_parts),
+        tool_calls=calls,
+        tokens_in=ti,
+        tokens_out=to,
+        cost=config.cost_usd(model, ti, to),
+        raw=raw,
+        provider_content=provider_content,
+        gateway="anthropic",
+        actual_provider="anthropic",
+        actual_model=raw.get("model") or model,
+        response_id=raw.get("id") or "",
+    )
