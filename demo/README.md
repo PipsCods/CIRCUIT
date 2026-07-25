@@ -6,11 +6,11 @@ artifacts. It makes no network or model calls in the browser.
 The page has three beats:
 
 1. The measured benefit of CIRCUIT, visible immediately.
-2. The progression from Gemma alone, to raw Alien MCP, to Alien MCP with
+2. The progression from Gemma alone, to Vanilla Alien MCP, to Alien MCP with
    engineered context.
 3. The upcoming Gemma + CIRCUIT versus Fable 5 benchmark.
 
-Only the raw-MCP and engineered-context stages have measured values today. The
+Only the Vanilla Alien MCP and engineered-context stages have measured values today. The
 source is the corrected `runs 2` A/C experiment: both conditions now meet the
 strict JSON contract. Gemma without MCP is labeled as a conceptual reference,
 and Fable 5 is labeled as not yet run.

@@ -22,7 +22,6 @@
     "hero-recall-before": percent(aggregateA.gold_recall_at_5),
     "hero-cost-per-cite": money(aggregateC.cost_per_verified),
     "hero-cost-per-cite-before": money(aggregateA.cost_per_verified),
-    "hero-waste-drop": `${tokenDrop.toFixed(1)}%`,
     "hero-token-drop": `−${tokenDrop.toFixed(1)}%`,
     "hero-token-before": number(aggregateA.mean_tokens),
     "hero-token-after": number(aggregateC.mean_tokens),
