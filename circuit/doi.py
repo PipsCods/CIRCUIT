@@ -3,6 +3,7 @@ import hashlib
 import json
 import re
 import threading
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -14,6 +15,7 @@ from .mcp_client import MCP
 DOI_PREFIX = re.compile(r"^(?:https?://(?:dx\.)?doi\.org/|doi:\s*)", re.I)
 DOI_SHAPE = re.compile(r"^10\.\d{4,9}/\S+$", re.I)
 _CACHE_LOCK = threading.Lock()
+_CROSSREF_SEMAPHORE = threading.BoundedSemaphore(2)
 
 
 def normalize(doi):
@@ -52,13 +54,23 @@ def _crossref_resolves(doi):
             "User-Agent": "CIRCUIT/0.1 (deterministic citation evaluation)",
         },
     )
-    try:
-        with urllib.request.urlopen(req, timeout=30) as response:
-            payload = json.loads(response.read())
-    except urllib.error.HTTPError as exc:
-        if exc.code in (400, 404):
-            return False
-        raise
+    for attempt in range(4):
+        try:
+            with _CROSSREF_SEMAPHORE:
+                with urllib.request.urlopen(req, timeout=30) as response:
+                    payload = json.loads(response.read())
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code in (400, 404):
+                return False
+            if exc.code != 429 or attempt == 3:
+                raise
+            retry_after = exc.headers.get("Retry-After")
+            try:
+                delay = float(retry_after)
+            except (TypeError, ValueError):
+                delay = attempt + 1
+            time.sleep(min(max(delay, 0.5), 5.0))
     message = payload.get("message") if isinstance(payload, dict) else None
     return (
         payload.get("status") == "ok"

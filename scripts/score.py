@@ -26,7 +26,14 @@ def returned_dois(parsed):
 def metrics(name, traces, gold):
     n = len(traces)
     tool_calls = [call for trace in traces for call in trace.get("tool_calls", [])]
-    checks = [check for trace in traces for check in trace.get("doi_checks", [])]
+    checks = []
+    for trace in traces:
+        existing = {
+            doi.normalize(check.get("doi")): check
+            for check in trace.get("doi_checks", [])
+        }
+        for value in returned_dois(trace.get("parsed")):
+            checks.append(existing.get(value) or doi.resolve(value))
     verified = sum(
         bool(check.get("resolves_openaire") or check.get("resolves_crossref"))
         for check in checks

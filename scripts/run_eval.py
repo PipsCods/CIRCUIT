@@ -68,8 +68,7 @@ def evaluate(config_name, model, context, question):
                 resolution_errors.append(
                     f"{value}: {type(exc).__name__}: {exc}"
                 )
-        if resolution_errors:
-            trace["error"] = "DOI resolution failed: " + "; ".join(resolution_errors)
+        trace["resolution_errors"] = resolution_errors
     return {
         "config": config_name,
         "qid": question["id"],
