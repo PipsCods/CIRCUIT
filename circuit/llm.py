@@ -13,7 +13,9 @@ does mean Sonnet's numbers can move slightly between runs. Fable 5 additionally
 does not support temperature=0, so the parameter is omitted for that optional
 model.
 """
+import http.client
 import json
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -36,6 +38,7 @@ class Reply:
     actual_provider: str = ""
     actual_model: str = ""
     response_id: str = ""
+    transport_attempts: int = 1
 
 
 def chat(model, messages, tools=None, temperature=0.0, max_tokens=2048,
@@ -86,11 +89,28 @@ def _openrouter(model, messages, tools, temperature, max_tokens,
         },
         method="POST",
     )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            data = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"OpenRouter {e.code}: {e.read().decode()[:400]}") from None
+    data = None
+    attempts = 0
+    for attempts in range(1, config.TRANSPORT_MAX_ATTEMPTS + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                data = json.loads(r.read())
+            break
+        except urllib.error.HTTPError as e:
+            raise RuntimeError(
+                f"OpenRouter {e.code}: {e.read().decode()[:400]}"
+            ) from None
+        except (
+            urllib.error.URLError,
+            http.client.RemoteDisconnected,
+            TimeoutError,
+        ) as exc:
+            if attempts == config.TRANSPORT_MAX_ATTEMPTS:
+                raise RuntimeError(
+                    f"OpenRouter transport failed after {attempts} attempts: "
+                    f"{type(exc).__name__}: {exc}"
+                ) from None
+            time.sleep(config.TRANSPORT_RETRY_DELAYS[attempts - 1])
 
     if "choices" not in data:
         raise RuntimeError(f"OpenRouter returned no choices: {str(data)[:400]}")
@@ -118,6 +138,7 @@ def _openrouter(model, messages, tools, temperature, max_tokens,
         actual_provider=data.get("provider") or "openrouter-unspecified",
         actual_model=data.get("model") or model,
         response_id=data.get("id") or "",
+        transport_attempts=attempts,
     )
 
 

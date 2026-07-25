@@ -61,6 +61,7 @@ def run(model, context, question, max_turns=config.MAX_TURNS):
             "actual_provider": reply.actual_provider,
             "actual_model": reply.actual_model or model,
             "response_id": reply.response_id,
+            "transport_attempts": reply.transport_attempts,
             "temperature": (
                 None if model in config.NO_TEMPERATURE else config.TEMPERATURE
             ),

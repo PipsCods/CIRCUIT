@@ -160,6 +160,10 @@ def build_manifest(run_id, config_name, model, context, questions):
             ),
             "max_tokens": config.MAX_TOKENS,
             "max_turns": config.MAX_TURNS,
+            "transport_max_attempts": config.TRANSPORT_MAX_ATTEMPTS,
+            "transport_retry_delays_seconds": list(
+                config.TRANSPORT_RETRY_DELAYS
+            ),
         },
         "context": {
             "name": context.name,
