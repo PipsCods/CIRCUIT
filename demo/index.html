@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="CIRCUIT makes small models reliable over the Alien OpenAIRE MCP through context engineering.">
+  <title>CIRCUIT — Context is the system</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#proof" aria-label="CIRCUIT home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>CIRCUIT</span>
+    </a>
+    <nav aria-label="Demo chapters">
+      <a href="#proof">Proof</a>
+      <a href="#progression">Progression</a>
+      <a href="#frontier">Frontier</a>
+    </nav>
+    <span class="evidence-state"><i aria-hidden="true"></i>25 frozen questions</span>
+  </header>
+
+  <main>
+    <section class="hero chapter" id="proof" aria-labelledby="hero-heading">
+      <div class="hero-copy">
+        <p class="kicker">GEMMA 4 · ALIEN OPENAIRE MCP · DETERMINISTIC EVAL</p>
+        <h1 id="hero-heading">Same model.<br>Same evidence.<br><span id="hero-waste-drop">58%</span> less waste.</h1>
+        <p class="lede">
+          The corrected baseline already returns valid JSON and real DOIs.
+          CIRCUIT makes the same retrieval task materially more efficient and reliable.
+        </p>
+      </div>
+
+      <div class="hero-proof" aria-label="Headline benchmark results">
+        <article class="hero-metric hero-metric-primary">
+          <span class="metric-label">Gold recall@5</span>
+          <strong id="hero-recall">65.6%</strong>
+          <span class="metric-delta"><b id="hero-recall-before">60.8%</b> raw MCP</span>
+        </article>
+        <article class="hero-metric">
+          <span class="metric-label">Zero-result calls</span>
+          <strong id="hero-zero">0%</strong>
+          <span class="metric-delta">from <b id="hero-zero-before">41.9%</b></span>
+        </article>
+        <article class="hero-metric">
+          <span class="metric-label">Cost / verified DOI</span>
+          <strong id="hero-cost-per-cite">$0.000158</strong>
+          <span class="metric-delta">from <b id="hero-cost-per-cite-before">$0.000354</b></span>
+        </article>
+        <article class="hero-metric">
+          <span class="metric-label">Tokens / question</span>
+          <strong id="hero-token-drop">−46.3%</strong>
+          <span class="metric-delta"><b id="hero-token-before">10,708</b> → <b id="hero-token-after">5,749</b></span>
+        </article>
+      </div>
+
+      <div class="hero-foot">
+        <span>No LLM judge</span>
+        <span>100% valid JSON on both</span>
+        <span>Temperature 0</span>
+        <span>Same model · same MCP</span>
+      </div>
+    </section>
+
+    <section class="progression" id="progression" aria-labelledby="progression-heading">
+      <header class="section-intro">
+        <p class="kicker">THE ONE-MINUTE STORY</p>
+        <h2 id="progression-heading">Access to evidence is not enough.<br>Models need a usable contract.</h2>
+      </header>
+
+      <div class="story-rail" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+
+      <article class="story-card chapter stage-alone">
+        <div class="stage-number">01</div>
+        <div class="stage-copy">
+          <p class="stage-label">Gemma 4 · No MCP</p>
+          <h3>Answers from memory.</h3>
+          <p>
+            The model can produce plausible titles and DOIs, but it has no
+            evidence channel to prove that any citation exists.
+          </p>
+          <span class="measurement-tag">Conceptual reference · not scored</span>
+        </div>
+        <div class="stage-visual memory-visual" aria-label="Ungrounded answer illustration">
+          <div class="model-node">Gemma</div>
+          <div class="loose-output">
+            <span></span><span></span><span></span>
+            <em>?</em>
+          </div>
+          <p>Parametric memory</p>
+        </div>
+      </article>
+
+      <article class="story-card chapter stage-mcp">
+        <div class="stage-number">02</div>
+        <div class="stage-copy">
+          <p class="stage-label">Gemma 4 + Raw Alien MCP</p>
+          <h3>The evidence is there.<br>The interface still gets in the way.</h3>
+          <p>
+            Alien retrieves real papers and Gemma returns valid JSON. But it still
+            navigates a 43-parameter schema and undocumented AND search semantics.
+          </p>
+          <div class="stage-metrics">
+            <span><strong id="raw-zero">41.9%</strong> zero-result calls</span>
+            <span><strong id="raw-tokens">13,697</strong> tokens / question</span>
+          </div>
+        </div>
+        <div class="stage-visual schema-visual" aria-label="Overloaded MCP schema illustration">
+          <div class="visual-header">
+            <span>search_research_products</span>
+            <b id="raw-parameter-count">43 params</b>
+          </div>
+          <div class="parameter-field" aria-hidden="true"></div>
+          <div class="failure-strip">
+            <span>invalid sort</span>
+            <span>0 results</span>
+            <span>extra retries</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="story-card story-card-winner chapter stage-circuit">
+        <div class="stage-number">03</div>
+        <div class="stage-copy">
+          <p class="stage-label">Gemma 4 + Alien MCP + CIRCUIT</p>
+          <h3>Same evidence.<br><span>A context Gemma can use.</span></h3>
+          <p>
+            CIRCUIT prunes the tool, explains its quirks, sequences recovery,
+            and forbids citations that never appeared in evidence.
+          </p>
+          <div class="stage-metrics stage-metrics-win">
+            <span><strong id="engineered-tokens">5,749</strong> tokens / question</span>
+            <span><strong id="engineered-zero">0%</strong> zero-result calls</span>
+            <span><strong id="engineered-recall">65.6%</strong> recall@5</span>
+          </div>
+        </div>
+        <div class="stage-visual circuit-visual" aria-label="CIRCUIT context transformation">
+          <div class="compiler-input">
+            <span>Raw MCP</span>
+            <strong id="compiler-before">43</strong>
+          </div>
+          <div class="compiler-core">
+            <p>CIRCUIT</p>
+            <div class="compiler-line"><i></i><i></i><i></i><i></i></div>
+            <div class="compiler-rules">
+              <span>Prune</span>
+              <span>Explain</span>
+              <span>Sequence</span>
+              <span>Ground</span>
+            </div>
+          </div>
+          <div class="compiler-output">
+            <span>Usable contract</span>
+            <strong id="compiler-after">5</strong>
+          </div>
+          <div class="verified-output">
+            <i>✓</i>
+            <div><strong>Evidence-only JSON</strong><span>Every DOI verified</span></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="frontier chapter" id="frontier" aria-labelledby="frontier-heading">
+      <div class="frontier-copy">
+        <p class="kicker">THE CLAIM WE TEST NEXT</p>
+        <h2 id="frontier-heading">Can engineered Gemma<br>reach frontier quality?</h2>
+        <p>
+          The slot is ready. Fable 5 results will appear only after the same
+          frozen benchmark has run—never as a fabricated placeholder.
+        </p>
+      </div>
+
+      <div class="versus" aria-label="Upcoming model comparison">
+        <article class="versus-model versus-model-ready">
+          <span class="versus-label">Small model · measured</span>
+          <h3>Gemma 4</h3>
+          <p>Alien MCP + CIRCUIT</p>
+          <div class="versus-score">
+            <strong id="versus-gemma-recall">65.6%</strong>
+            <span>gold recall@5</span>
+          </div>
+          <span class="ready-state">Benchmark complete</span>
+        </article>
+
+        <div class="versus-mark" aria-hidden="true">vs</div>
+
+        <article class="versus-model versus-model-pending">
+          <span class="versus-label">Frontier model · pending</span>
+          <h3>Fable 5</h3>
+          <p>Same benchmark · same Alien MCP</p>
+          <div class="pending-score">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="pending-state">Not run yet</span>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <span class="brand footer-brand">CIRCUIT</span>
+        <p>Context engineering for reliable small-model agents.</p>
+      </div>
+      <p class="footer-proof">
+        All displayed metrics come from the corrected frozen 25-question A/C experiment.
+        Unmeasured stages are labeled explicitly.
+      </p>
+    </footer>
+  </main>
+
+  <script src="./demo-data.js?v=runs2-corrected-v2"></script>
+  <script src="./app.js?v=runs2-corrected-v2"></script>
+</body>
+</html>
