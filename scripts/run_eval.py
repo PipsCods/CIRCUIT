@@ -14,6 +14,8 @@ from circuit import agent, config, contexts, doi  # noqa: E402
 CONFIGS = {
     "A": (config.SMALL, contexts.NAIVE),
     "B": (config.LARGE, contexts.NAIVE),
+    "C": (config.SMALL, contexts.ENGINEERED),
+    "D": (config.LARGE, contexts.ENGINEERED),
 }
 
 
