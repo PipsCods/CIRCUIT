@@ -42,6 +42,15 @@ PRICES = {
 SEED = 20260725
 
 MCP_OPENAIRE = "https://openaire.mcp.alien.club/mcp"
+
+# The live server namespaces every tool with an `openaire_` prefix. Alien's
+# explore-openaire skill documents them WITHOUT it, so trust this list, not the
+# skill doc.
+T_SEARCH = "openaire_search_research_products"
+T_INFLUENCE = "openaire_find_by_influence_class"
+T_DETAILS = "openaire_get_research_product_details"
+T_RELATIONS = "openaire_explore_research_relationships"
+
 MCP_BIORXIV = "https://biorxiv.mcp.alien.club/mcp"
 MCP_MEDRXIV = "https://medrxiv.mcp.alien.club/mcp"
 

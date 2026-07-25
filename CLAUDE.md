@@ -86,9 +86,20 @@ python3 scripts/smoke.py            # must print ALL CHECKS PASSED
 
 ## Gotchas that cost us time — do not rediscover these
 
+- **Live tool names are prefixed `openaire_`.** Alien's `explore-openaire` skill doc
+  documents them *without* the prefix (`search_research_products`). The doc is wrong for
+  this deployment — trust `tools/list`, and use the `T_*` constants in `config.py`.
+- **Responses use an envelope**: `{success, data:{results,pagination}, summary, _debug}`.
+  Results are at `data.results`, not top level, and `summary.results_returned` /
+  `summary.total_results` are authoritative. A counter that scans only the top level
+  silently reports 1 for everything, which quietly destroys the zero-result metric.
 - **OpenAIRE search is AND logic.** More query terms means *fewer* results, the opposite
-  of Google. `"ADC linker toxicity"` works; adding four more terms returns 0. This is
-  the single biggest source of naive-model failure and the core thing our context fixes.
+  of Google. Verified: `"CRISPR"` returns 5 of 136,389 matches; the same query plus nine
+  more terms returns **0 of 0**. This is the single biggest source of naive-model failure
+  and the core thing our context fixes.
+- **`openaire_search_research_products` takes 43 parameters.** Handing that schema
+  verbatim to a 4B-active model is itself a context-engineering failure. Pruning it to
+  the ~5 that matter is one of our cheapest, highest-leverage wins.
 - `explore_research_relationships` needs **`target_pid`**, not `doi`, for incoming
   citations. The `doi` param finds outgoing refs, which are sparsely indexed.
 - `search_datasets` returns `datasets[]`, not `results[]`.

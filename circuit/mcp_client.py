@@ -108,11 +108,11 @@ class MCP:
             text = "\n".join(
                 c.get("text", "") for c in res.get("content", [])
                 if c.get("type") == "text")
-            out = {
-                "ok": not res.get("isError", False),
-                "text": text,
-                "n_results": _count_results(text),
-            }
+            ok = not res.get("isError", False)
+            # A failed call has zero results, never one. Counting an error string
+            # as a result silently turns "the tool broke" into "the tool found
+            # something", which would corrupt the zero-result metric.
+            out = {"ok": ok, "text": text, "n_results": _count_results(text) if ok else 0}
 
         path.write_text(json.dumps(out))
         out["cached"] = False
@@ -120,21 +120,31 @@ class MCP:
 
 
 def _count_results(text: str) -> int:
-    """Best-effort result count. Zero-result calls are the signal we care about,
-    so this only needs to separate 'got something' from 'got nothing'."""
+    """Result count for an Alien MCP payload.
+
+    Responses use the envelope {success, data:{results,pagination}, summary,
+    _debug}. `summary.results_returned` is authoritative when present; the
+    nested scan is the fallback for tools that shape their output differently.
+    """
     if not text.strip():
         return 0
     try:
         d = json.loads(text)
     except json.JSONDecodeError:
-        return 1 if text.strip() else 0
+        return 1
     if isinstance(d, list):
         return len(d)
-    if isinstance(d, dict):
+    if not isinstance(d, dict):
+        return 1
+
+    summary = d.get("summary")
+    if isinstance(summary, dict) and isinstance(summary.get("results_returned"), int):
+        return summary["results_returned"]
+
+    for scope in (d.get("data"), d):
+        if not isinstance(scope, dict):
+            continue
         for k in ("results", "datasets", "products", "items", "authors", "nodes"):
-            if isinstance(d.get(k), list):
-                return len(d[k])
-        for v in d.values():
-            if isinstance(v, list):
-                return len(v)
+            if isinstance(scope.get(k), list):
+                return len(scope[k])
     return 1

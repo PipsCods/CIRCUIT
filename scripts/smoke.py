@@ -104,32 +104,37 @@ def c_large():
     return f"{r.tokens_in}+{r.tokens_out} tok, ${r.cost:.8f}"
 
 
-@check("OpenAIRE MCP authenticates and lists tools")
+@check("OpenAIRE MCP authenticates and exposes the tools we depend on")
 def c_mcp_list():
-    tools = MCP().list_tools()
-    if not tools:
+    names = {t["name"] for t in MCP().list_tools()}
+    if not names:
         raise RuntimeError("tools/list returned nothing")
-    names = [t["name"] for t in tools]
-    globals()["_TOOL_NAMES"] = names
-    return f"{len(names)} tools: {', '.join(names[:4])}..."
+    need = {config.T_SEARCH, config.T_INFLUENCE, config.T_DETAILS, config.T_RELATIONS}
+    missing = need - names
+    if missing:
+        raise RuntimeError(f"expected tools absent: {sorted(missing)}")
+    return f"{len(names)} tools, all 4 required present"
 
 
 @check("OpenAIRE returns real results for a well-formed query")
 def c_mcp_call():
-    m = MCP()
-    out = m.call("search_research_products",
-                 {"query": "CRISPR", "page_size": 5, "sort_by": "citationCount DESC"})
-    if not out["ok"] or out["n_results"] == 0:
-        raise RuntimeError(f"expected results, got {out['n_results']}: {out['text'][:200]}")
+    out = MCP().call(config.T_SEARCH, {"query": "CRISPR", "page_size": 5})
+    if not out["ok"]:
+        raise RuntimeError(f"call failed: {out['text'][:250]}")
+    if out["n_results"] == 0:
+        raise RuntimeError("well-formed query returned nothing — check param names")
     return f"{out['n_results']} results, {len(out['text'])} chars"
 
 
 @check("PREMISE: an over-specified query returns zero results")
 def c_premise():
-    m = MCP()
     narrow = ("antibody drug conjugate cleavable linker plasma stability "
               "payload potency off-target toxicity clinical outcomes")
-    out = m.call("search_research_products", {"query": narrow, "page_size": 5})
+    out = MCP().call(config.T_SEARCH, {"query": narrow, "page_size": 5})
+    # Must distinguish "the query legitimately matched nothing" from "the call
+    # errored". Only the former validates the premise.
+    if not out["ok"]:
+        raise RuntimeError(f"call errored, premise untested: {out['text'][:250]}")
     if out["n_results"] > 0:
         raise RuntimeError(
             f"expected 0 results but got {out['n_results']} — the AND-logic failure "
