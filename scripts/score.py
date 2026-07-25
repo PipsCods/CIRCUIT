@@ -8,6 +8,7 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from circuit import config, doi  # noqa: E402
+from scripts.run_eval import CONFIGS  # noqa: E402
 
 
 def returned_dois(parsed):
@@ -53,9 +54,11 @@ def metrics(name, traces, gold):
         "openaire": openaire / len(checks) if checks else 0.0,
         "crossref": crossref / len(checks) if checks else 0.0,
         "gold_recall": gold_hits / (5 * n) if n else 0.0,
+        # No retrieval calls is a distinct experimental condition, not a 0%
+        # zero-result rate. Keep it out of the denominator and display N/A.
         "zero_rate": (
             sum(call.get("n_results") == 0 for call in tool_calls) / len(tool_calls)
-            if tool_calls else 0.0
+            if tool_calls else None
         ),
         "schema": (
             sum(trace.get("parse_error") is None for trace in traces) / n
@@ -87,7 +90,7 @@ def main():
     ]
     gold = {question["id"]: question for question in questions}
     rows = []
-    for name in ("A", "B", "C", "D", "E", "F"):
+    for name in sorted(CONFIGS):
         directory = config.RUNS / name
         if not directory.exists():
             continue
@@ -113,7 +116,7 @@ def main():
             str(row["n"]),
             pct(row["validity"]),
             pct(row["gold_recall"]),
-            pct(row["zero_rate"]),
+            pct(row["zero_rate"]) if row["zero_rate"] is not None else "N/A",
             pct(row["schema"]),
             f"{row['mean_tokens']:.0f}",
             money(row["cost"]),

@@ -23,6 +23,15 @@ NAIVE_PROMPT = (
     "a preamble, headings, tables, notes, or any text before or after the JSON object."
 )
 
+OUTPUT_CONTRACT = """\
+OUTPUT CONTRACT
+Your entire final response must be one raw JSON object with exactly this shape:
+{"answer":"brief evidence-grounded answer","citations":[{"doi":"10.xxxx/...",
+"title":"paper title","citation_count":0}]}
+Use an integer citation_count. Do not add Markdown fences, a preamble, headings,
+tables, notes, or any text before or after the JSON object.\
+"""
+
 ENGINEERED_PROMPT = """\
 ROLE
 You are an evidence-retrieval agent operating only on OpenAIRE tool evidence.
@@ -40,13 +49,21 @@ return an empty citations list rather than guessing.
 DOI, title, and citation count. Never emit a DOI that did not appear in a tool
 result in this conversation.
 
-OUTPUT CONTRACT
-Your entire final response must be one raw JSON object with exactly this shape:
-{"answer":"brief evidence-grounded answer","citations":[{"doi":"10.xxxx/...",
-"title":"paper title","citation_count":0}]}
-Use an integer citation_count. Do not add Markdown fences, a preamble, headings,
-tables, notes, or any text before or after the JSON object.\
-"""
+""" + OUTPUT_CONTRACT
+
+INTRINSIC_PROMPT = """\
+ROLE
+You are a research assistant answering only from knowledge stored in the model.
+You have no tools or external sources and must not claim to have searched,
+browsed, retrieved, or verified information.
+
+KNOWLEDGE-ONLY PROCEDURE
+Identify the five most influential papers requested by the user from intrinsic
+knowledge alone. Do not invent a DOI or title. If you cannot confidently recall
+five papers, return fewer rather than guessing. Citation counts change over time
+and cannot be looked up in this condition, so provide your best integer estimate.
+
+""" + OUTPUT_CONTRACT
 
 _SCHEMA_CACHE = config.CACHE / "openaire_tool_schemas.json"
 _NAIVE_TOOL_NAMES = (config.T_SEARCH, config.T_INFLUENCE)
@@ -181,5 +198,10 @@ def engineered():
     return Context("engineered", ENGINEERED_PROMPT, [search, influence])
 
 
+def intrinsic():
+    return Context("intrinsic", INTRINSIC_PROMPT, [])
+
+
 NAIVE = naive
 ENGINEERED = engineered
+INTRINSIC = intrinsic
