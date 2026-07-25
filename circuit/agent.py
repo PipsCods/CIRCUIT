@@ -30,7 +30,10 @@ def run(model, context, question, max_turns=config.MAX_TURNS):
         tool["function"]["name"]: tool["function"].get("parameters", {})
         for tool in context.tools
     }
-    mcp = MCP()
+    # Construct the retrieval client only if the model actually emits an
+    # allowed tool call. A context with no tools is therefore intrinsically
+    # model-only: it cannot initialize, authenticate to, or query OpenAIRE.
+    mcp = None
     calls = []
     evidence_ledger = []
     evidence_blobs = {}
@@ -129,6 +132,8 @@ def run(model, context, question, max_turns=config.MAX_TURNS):
                     call["args"], allowed_tools[call["name"]]
                 )
                 try:
+                    if mcp is None:
+                        mcp = MCP()
                     out = mcp.call(call["name"], call["args"])
                     trace.update({
                         "n_results": out["n_results"],

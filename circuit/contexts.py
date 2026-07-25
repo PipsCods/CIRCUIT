@@ -19,23 +19,28 @@ A successful response must be one raw JSON object with exactly two top-level
 keys, "answer" and "citations". The citations array must contain exactly five
 distinct objects, each with exactly these keys:
 {"doi":"10.xxxx/...","title":"paper title","citation_count":0}
-Every DOI and title must be a non-empty string copied from successful OpenAIRE
-tool evidence, and every citation_count must be a non-negative integer copied
-from that evidence. Never emit null. Skip records without a DOI and continue
-down the ranked results. Do not add Markdown fences, a preamble, headings,
-tables, notes, or any text before or after the JSON object.
+Every DOI and title must be a non-empty string, and every citation_count must be
+a non-negative integer. Never emit null. Do not add Markdown fences, a preamble,
+headings, tables, notes, or any text before or after the JSON object.
 
-If five complete, grounded records remain impossible after the allowed search
-attempts, return the same two top-level keys with an empty citations array and
-briefly explain the evidence shortage in "answer". This is a safe abstention,
-not a successful five-citation response.\
+If five complete records remain impossible, return the same two top-level keys
+with an empty citations array and briefly explain the shortage in "answer".
+This is a safe abstention, not a successful five-citation response.\
 """
 
+RETRIEVAL_EVIDENCE_RULES = """\
+EVIDENCE RULES
+Every DOI, title, and citation_count must be copied from successful OpenAIRE
+tool evidence in this conversation. Never fill a missing field from model
+memory. Skip records without a DOI and continue down the ranked results.\
+"""
 
 NAIVE_PROMPT = (
     "You are a research assistant with access to the OpenAIRE research graph. "
     "Use the provided tools to identify the five most influential papers requested "
     "by the user, including each paper's DOI, title, and citation count.\n\n"
+    + RETRIEVAL_EVIDENCE_RULES
+    + "\n\n"
     + OUTPUT_CONTRACT
 )
 
@@ -56,6 +61,21 @@ two shorter-query retries.
 4. Request detail="standard" only when a candidate has a DOI but another
 required field is missing. Never emit a DOI, title, or count that did not appear
 in a successful tool result in this conversation.
+
+""" + RETRIEVAL_EVIDENCE_RULES + "\n\n" + OUTPUT_CONTRACT
+
+INTRINSIC_PROMPT = """\
+ROLE
+You are a research assistant answering only from knowledge stored in the model.
+You have no tools or external sources and must not claim to have searched,
+browsed, retrieved, or verified information.
+
+KNOWLEDGE-ONLY PROCEDURE
+Identify the five most influential papers requested by the user from intrinsic
+knowledge alone. Do not invent a DOI or title. If you cannot confidently recall
+five papers, return an empty citations array rather than guessing. Citation
+counts change over time and cannot be looked up in this condition, so provide
+your best integer estimate.
 
 """ + OUTPUT_CONTRACT
 
@@ -156,5 +176,10 @@ def engineered():
     return Context("engineered", ENGINEERED_PROMPT, [search])
 
 
+def intrinsic():
+    return Context("intrinsic", INTRINSIC_PROMPT, [])
+
+
 NAIVE = naive
 ENGINEERED = engineered
+INTRINSIC = intrinsic

@@ -98,7 +98,18 @@ def metrics(name, traces, gold, metadata_status="legacy/unverified"):
         )
 
         resolutions = _resolution_map(trace)
-        has_evidence = isinstance(trace.get("evidence_ledger"), list)
+        # Intrinsic configurations deliberately have no retrieval evidence.
+        # Their DOI resolution and gold overlap remain scoreable, while tool
+        # and grounding metrics must stay N/A rather than becoming misleading
+        # zeroes merely because the trace shape includes an empty ledger.
+        intrinsic = (
+            trace.get("context") == "intrinsic"
+            or name in {"G", "H", "I"}
+        )
+        has_evidence = (
+            not intrinsic
+            and isinstance(trace.get("evidence_ledger"), list)
+        )
         ledger = trace.get("evidence_ledger", []) if has_evidence else []
         if has_evidence:
             evidence_trace_count += 1
@@ -321,7 +332,7 @@ def _load_rows(run_id=None):
     else:
         candidates = [
             (name, config.RUNS / name)
-            for name in ("A", "B", "C", "D", "E", "F")
+            for name in ("A", "B", "C", "D", "E", "F", "G", "H", "I")
             if (config.RUNS / name).exists()
         ]
 
