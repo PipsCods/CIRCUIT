@@ -1,0 +1,99 @@
+{
+  "config": "C",
+  "qid": "q17",
+  "topic": "organoid disease models",
+  "question": "What are the most influential papers on organoid disease models? Return 5 with DOIs and citation counts.",
+  "model": "google/gemma-4-26b-a4b-it",
+  "context": "engineered",
+  "tool_calls": [
+    {
+      "turn": 1,
+      "name": "openaire_search_research_products",
+      "args": {
+        "detail": "minimal",
+        "page_size": 10,
+        "query": "organoid disease models",
+        "sort_by": "citationCount DESC"
+      },
+      "n_results": 10,
+      "cached": false,
+      "ok": true
+    }
+  ],
+  "final_text": "{\"answer\":\"The most influential papers on organoid disease models, based on citation counts, include research on pancreatic cancer, glioma molecular profiling, general cancer research applications, prostate cancer patient-derived cultures, and intestinal stem cell culture matrices.\",\"citations\":[{\"doi\":\"10.1016/j.cell.2014.12.021\",\"title\":\"Organoid Models of Human and Mouse Ductal Pancreatic Cancer\",\"citation_count\":1961},{\"doi\":\"10.1016/j.cell.2015.12.028\",\"title\":\"Molecular Profiling Reveals Biologically Discrete Subsets and Pathways of Progression in Diffuse Glioma\",\"citation_count\":1905},{\"doi\":\"10.1038/s41568-018-0007-6\",\"title\":\"Organoids in cancer research\",\"citation_count\":1548},{\"doi\":\"10.1016/j.cell.2014.08.016\",\"title\":\"Organoid Cultures Derived from Patients with Advanced Prostate Cancer\",\"citation_count\":1402},{\"doi\":\"10.1038/nature20168\",\"title\":\"Designer matrices for intestinal stem cell and organoid culture\",\"citation_count\":1307}]}",
+  "parsed": {
+    "answer": "The most influential papers on organoid disease models, based on citation counts, include research on pancreatic cancer, glioma molecular profiling, general cancer research applications, prostate cancer patient-derived cultures, and intestinal stem cell culture matrices.",
+    "citations": [
+      {
+        "doi": "10.1016/j.cell.2014.12.021",
+        "title": "Organoid Models of Human and Mouse Ductal Pancreatic Cancer",
+        "citation_count": 1961
+      },
+      {
+        "doi": "10.1016/j.cell.2015.12.028",
+        "title": "Molecular Profiling Reveals Biologically Discrete Subsets and Pathways of Progression in Diffuse Glioma",
+        "citation_count": 1905
+      },
+      {
+        "doi": "10.1038/s41568-018-0007-6",
+        "title": "Organoids in cancer research",
+        "citation_count": 1548
+      },
+      {
+        "doi": "10.1016/j.cell.2014.08.016",
+        "title": "Organoid Cultures Derived from Patients with Advanced Prostate Cancer",
+        "citation_count": 1402
+      },
+      {
+        "doi": "10.1038/nature20168",
+        "title": "Designer matrices for intestinal stem cell and organoid culture",
+        "citation_count": 1307
+      }
+    ]
+  },
+  "parse_error": null,
+  "turns": 2,
+  "tokens_in": 3555,
+  "tokens_out": 339,
+  "tokens_total": 3894,
+  "cost": 0.0005452499999999999,
+  "error": null,
+  "doi_checks": [
+    {
+      "doi": "10.1016/j.cell.2014.12.021",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1016/j.cell.2015.12.028",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1038/s41568-018-0007-6",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1016/j.cell.2014.08.016",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1038/nature20168",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    }
+  ],
+  "resolution_errors": []
+}

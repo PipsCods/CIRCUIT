@@ -1,0 +1,99 @@
+{
+  "config": "C",
+  "qid": "q24",
+  "topic": "SARS-CoV-2 spike protein",
+  "question": "What are the most influential papers on SARS-CoV-2 spike protein? Return 5 with DOIs and citation counts.",
+  "model": "google/gemma-4-26b-a4b-it",
+  "context": "engineered",
+  "tool_calls": [
+    {
+      "turn": 1,
+      "name": "openaire_search_research_products",
+      "args": {
+        "detail": "minimal",
+        "page_size": 10,
+        "query": "SARS-CoV-2 AND spike protein",
+        "sort_by": "citationCount DESC"
+      },
+      "n_results": 10,
+      "cached": false,
+      "ok": true
+    }
+  ],
+  "final_text": "{\"answer\":\"The most influential papers regarding the SARS-CoV-2 spike protein include foundational studies on cell entry mechanisms, structural determinations via cryo-EM, and the development of mRNA vaccines targeting the spike protein.\",\"citations\":[{\"doi\":\"10.1016/j.cell.2020.02.052\",\"title\":\"SARS-CoV-2 Cell Entry Depends on ACE2 and TMPRSS2 and Is Blocked by a Clinically Proven Protease Inhibitor\",\"citation_count\":17225},{\"doi\":\"10.1056/nejmoa2034577\",\"title\":\"Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine\",\"citation_count\":12491},{\"doi\":\"10.1056/nejmoa2035389\",\"title\":\"Efficacy and Safety of the mRNA-1273 SARS-CoV-2 Vaccine\",\"citation_count\":8820},{\"doi\":\"10.1126/science.abb2507\",\"title\":\"Cryo-EM structure of the 2019-nCoV spike in the prefusion conformation\",\"citation_count\":7868},{\"doi\":\"10.1038/s41586-020-2180-5\",\"title\":\"Structure of the SARS-CoV-2 spike receptor-binding domain bound to the ACE2 receptor\",\"citation_count\":5424}]}",
+  "parsed": {
+    "answer": "The most influential papers regarding the SARS-CoV-2 spike protein include foundational studies on cell entry mechanisms, structural determinations via cryo-EM, and the development of mRNA vaccines targeting the spike protein.",
+    "citations": [
+      {
+        "doi": "10.1016/j.cell.2020.02.052",
+        "title": "SARS-CoV-2 Cell Entry Depends on ACE2 and TMPRSS2 and Is Blocked by a Clinically Proven Protease Inhibitor",
+        "citation_count": 17225
+      },
+      {
+        "doi": "10.1056/nejmoa2034577",
+        "title": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+        "citation_count": 12491
+      },
+      {
+        "doi": "10.1056/nejmoa2035389",
+        "title": "Efficacy and Safety of the mRNA-1273 SARS-CoV-2 Vaccine",
+        "citation_count": 8820
+      },
+      {
+        "doi": "10.1126/science.abb2507",
+        "title": "Cryo-EM structure of the 2019-nCoV spike in the prefusion conformation",
+        "citation_count": 7868
+      },
+      {
+        "doi": "10.1038/s41586-020-2180-5",
+        "title": "Structure of the SARS-CoV-2 spike receptor-binding domain bound to the ACE2 receptor",
+        "citation_count": 5424
+      }
+    ]
+  },
+  "parse_error": null,
+  "turns": 2,
+  "tokens_in": 3688,
+  "tokens_out": 382,
+  "tokens_total": 4070,
+  "cost": 0.00057626,
+  "error": null,
+  "doi_checks": [
+    {
+      "doi": "10.1016/j.cell.2020.02.052",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1056/nejmoa2034577",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1056/nejmoa2035389",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1126/science.abb2507",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1038/s41586-020-2180-5",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    }
+  ],
+  "resolution_errors": []
+}

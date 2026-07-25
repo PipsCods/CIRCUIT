@@ -1,0 +1,72 @@
+{
+  "config": "D",
+  "qid": "q18",
+  "topic": "antibody-drug conjugates",
+  "question": "What are the most influential papers on antibody-drug conjugates? Return 5 with DOIs and citation counts.",
+  "model": "claude-sonnet-4-6",
+  "context": "engineered",
+  "tool_calls": [
+    {
+      "turn": 1,
+      "name": "openaire_search_research_products",
+      "args": {
+        "query": "antibody-drug conjugates",
+        "sort_by": "citationCount DESC",
+        "detail": "minimal",
+        "page_size": 10
+      },
+      "n_results": 10,
+      "cached": true,
+      "ok": true
+    },
+    {
+      "turn": 1,
+      "name": "openaire_find_by_influence_class",
+      "args": {
+        "influence_class": "C3",
+        "query": "antibody-drug conjugates",
+        "page_size": 10
+      },
+      "n_results": 10,
+      "cached": false,
+      "ok": true
+    },
+    {
+      "turn": 2,
+      "name": "openaire_search_research_products",
+      "args": {
+        "query": "antibody-drug conjugates cancer therapy",
+        "sort_by": "citationCount DESC",
+        "detail": "standard",
+        "page_size": 5
+      },
+      "n_results": 5,
+      "cached": false,
+      "ok": true
+    },
+    {
+      "turn": 3,
+      "name": "openaire_search_research_products",
+      "args": {
+        "query": "next generation antibody drug conjugates strategies challenges",
+        "sort_by": "citationCount DESC",
+        "detail": "standard",
+        "page_size": 3
+      },
+      "n_results": 3,
+      "cached": false,
+      "ok": true
+    }
+  ],
+  "final_text": "I now have all the evidence needed. Here are the 5 most influential ADC papers, combining raw citation counts and field-normalized influence:\n\n{\"answer\":\"The most influential papers on antibody-drug conjugates (ADCs), based on citation counts and field-normalized influence from OpenAIRE, span foundational chemistry, landmark clinical targets, and comprehensive reviews. The top paper is a 2017 Nature Reviews Drug Discovery review with nearly 2,000 citations covering next-generation ADC design strategies. Key experimental milestones include the 2003 auristatin conjugate paper (foundational for the MMAE payload used in many approved ADCs), the 2008 Trastuzumab-DM1 (T-DM1) paper targeting HER2-positive breast cancer, and a 2021 Nature Reviews Clinical Oncology review unlocking ADC potential. Together these works define the field's scientific and clinical trajectory.\",\"citations\":[{\"doi\":\"10.1038/nrd.2016.268\",\"title\":\"Strategies and challenges for the next generation of antibody–drug conjugates\",\"citation_count\":1997},{\"doi\":\"10.1158/0008-5472.can-08-1776\",\"title\":\"Targeting HER2-Positive Breast Cancer with Trastuzumab-DM1, an Antibody–Cytotoxic Drug Conjugate\",\"citation_count\":1435},{\"doi\":\"10.1038/nbt832\",\"title\":\"Development of potent monoclonal antibody auristatin conjugates for cancer therapy\",\"citation_count\":1108},{\"doi\":\"10.1038/s41571-021-00470-8\",\"title\":\"Unlocking the potential of antibody–drug conjugates for cancer therapy\",\"citation_count\":975},{\"doi\":\"10.1002/anie.201307628\",\"title\":\"Antibody–Drug Conjugates: An Emerging Concept in Cancer Therapy\",\"citation_count\":853}]}",
+  "parsed": null,
+  "parse_error": "JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+  "turns": 4,
+  "tokens_in": 19422,
+  "tokens_out": 980,
+  "tokens_total": 20402,
+  "cost": 0.07296599999999999,
+  "error": null,
+  "doi_checks": [],
+  "resolution_errors": []
+}

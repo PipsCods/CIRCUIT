@@ -1,0 +1,102 @@
+{
+  "config": "A",
+  "qid": "q11",
+  "topic": "viral-vector gene therapy",
+  "question": "What are the most influential papers on viral-vector gene therapy? Return 5 with DOIs and citation counts.",
+  "model": "google/gemma-4-26b-a4b-it",
+  "context": "naive",
+  "tool_calls": [
+    {
+      "turn": 1,
+      "name": "openaire_search_research_products",
+      "args": {
+        "influence_class": [
+          "C1",
+          "C2",
+          "C3"
+        ],
+        "query": "viral-vector gene therapy",
+        "sort_by": "influence DESC"
+      },
+      "n_results": 10,
+      "cached": false,
+      "ok": true
+    }
+  ],
+  "final_text": "{\"answer\": \"The five most influential papers on viral-vector gene therapy, based on citation counts and influence, are listed below.\", \"citations\": [{\"doi\": \"10.1126/science.272.5259.263\", \"title\": \"In Vivo Gene Delivery and Stable Transduction of Nondividing Cells by a Lentiviral Vector\", \"citation_count\": 4530}, {\"doi\": \"10.1038/nm1358\", \"title\": \"Successful transduction of liver in hemophilia by AAV-Factor IX and limitations imposed by the host immune response\", \"citation_count\": 1968}, {\"doi\": \"10.1056/nejmoa1706198\", \"title\": \"Single-Dose Gene-Replacement Therapy for Spinal Muscular Atrophy\", \"citation_count\": 1923}, {\"doi\": \"10.1128/jvi.72.3.2224-2232.1998\", \"title\": \"Production of High-Titer Recombinant Adeno-Associated Virus Vectors in the Absence of Helper Adenovirus\", \"citation_count\": 1255}, {\"doi\": \"10.1038/ng1094-148\", \"title\": \"Long-term gene expression and phenotypic correction using adeno-associated virus vectors in the mammalian brain\", \"citation_count\": 1031}]}",
+  "parsed": {
+    "answer": "The five most influential papers on viral-vector gene therapy, based on citation counts and influence, are listed below.",
+    "citations": [
+      {
+        "doi": "10.1126/science.272.5259.263",
+        "title": "In Vivo Gene Delivery and Stable Transduction of Nondividing Cells by a Lentiviral Vector",
+        "citation_count": 4530
+      },
+      {
+        "doi": "10.1038/nm1358",
+        "title": "Successful transduction of liver in hemophilia by AAV-Factor IX and limitations imposed by the host immune response",
+        "citation_count": 1968
+      },
+      {
+        "doi": "10.1056/nejmoa1706198",
+        "title": "Single-Dose Gene-Replacement Therapy for Spinal Muscular Atrophy",
+        "citation_count": 1923
+      },
+      {
+        "doi": "10.1128/jvi.72.3.2224-2232.1998",
+        "title": "Production of High-Titer Recombinant Adeno-Associated Virus Vectors in the Absence of Helper Adenovirus",
+        "citation_count": 1255
+      },
+      {
+        "doi": "10.1038/ng1094-148",
+        "title": "Long-term gene expression and phenotypic correction using adeno-associated virus vectors in the mammalian brain",
+        "citation_count": 1031
+      }
+    ]
+  },
+  "parse_error": null,
+  "turns": 2,
+  "tokens_in": 8242,
+  "tokens_out": 387,
+  "tokens_total": 8629,
+  "cost": 0.00112449,
+  "error": null,
+  "doi_checks": [
+    {
+      "doi": "10.1126/science.272.5259.263",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1038/nm1358",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1056/nejmoa1706198",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1128/jvi.72.3.2224-2232.1998",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1038/ng1094-148",
+      "resolves_openaire": true,
+      "resolves_crossref": true,
+      "fabricated": false,
+      "cached": false
+    }
+  ],
+  "resolution_errors": []
+}

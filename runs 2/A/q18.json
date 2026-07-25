@@ -1,0 +1,139 @@
+{
+  "config": "A",
+  "qid": "q18",
+  "topic": "antibody-drug conjugates",
+  "question": "What are the most influential papers on antibody-drug conjugates? Return 5 with DOIs and citation counts.",
+  "model": "google/gemma-4-26b-a4b-it",
+  "context": "naive",
+  "tool_calls": [
+    {
+      "turn": 1,
+      "name": "openaire_search_research_products",
+      "args": {
+        "query": "antibody-drug conjugates",
+        "sort_by": "citationCount",
+        "type": [
+          "Article"
+        ]
+      },
+      "n_results": 0,
+      "cached": false,
+      "ok": false
+    },
+    {
+      "turn": 2,
+      "name": "openaire_search_research_products",
+      "args": {
+        "query": "antibody-drug conjugates",
+        "sort_by": "citationCount DESC",
+        "type": [
+          "Article"
+        ]
+      },
+      "n_results": 0,
+      "cached": false,
+      "ok": false
+    },
+    {
+      "turn": 3,
+      "name": "openaire_search_research_products",
+      "args": {
+        "query": "antibody-drug conjugates",
+        "sort_by": "citationCount DESC",
+        "type": [
+          "Article"
+        ]
+      },
+      "n_results": 0,
+      "cached": true,
+      "ok": false
+    },
+    {
+      "turn": 4,
+      "name": "openaire_search_research_products",
+      "args": {
+        "query": "antibody-drug conjugates",
+        "sort_by": "citationCount DESC"
+      },
+      "n_results": 10,
+      "cached": false,
+      "ok": true
+    }
+  ],
+  "final_text": "{\"answer\": \"The five most influential papers on antibody-drug conjugates, based on citation count, are listed below.\", \"citations\": [{\"doi\": \"10.1038/nrd.2016.268\", \"title\": \"Strategies and challenges for the next generation of antibody–drug conjugates\", \"citation_count\": 1997}, {\"doi\": \"10.1038/nrc3236\", \"title\": \"Antibody therapy of cancer\", \"citation_count\": 1952}, {\"doi\": \"10.1007/s11095-006-9132-0\", \"title\": \"Micellar Nanocarriers: Pharmaceutical Perspectives\", \"citation_count\": 1722}, {\"doi\": \"10.1001/jama.2020.17598\", \"title\": \"Bladder Cancer\", \"citation_count\": 1453}, {\"doi\": \"10.1158/0008-5472.can-08-1776\", \"title\": \"Targeting HER2-Positive Breast Cancer with Trastuzumab-DM1, an Antibody–Cytotoxic Drug Conjugate\", \"citation_count\": 1435}]}",
+  "parsed": {
+    "answer": "The five most influential papers on antibody-drug conjugates, based on citation count, are listed below.",
+    "citations": [
+      {
+        "doi": "10.1038/nrd.2016.268",
+        "title": "Strategies and challenges for the next generation of antibody–drug conjugates",
+        "citation_count": 1997
+      },
+      {
+        "doi": "10.1038/nrc3236",
+        "title": "Antibody therapy of cancer",
+        "citation_count": 1952
+      },
+      {
+        "doi": "10.1007/s11095-006-9132-0",
+        "title": "Micellar Nanocarriers: Pharmaceutical Perspectives",
+        "citation_count": 1722
+      },
+      {
+        "doi": "10.1001/jama.2020.17598",
+        "title": "Bladder Cancer",
+        "citation_count": 1453
+      },
+      {
+        "doi": "10.1158/0008-5472.can-08-1776",
+        "title": "Targeting HER2-Positive Breast Cancer with Trastuzumab-DM1, an Antibody–Cytotoxic Drug Conjugate",
+        "citation_count": 1435
+      }
+    ]
+  },
+  "parse_error": null,
+  "turns": 5,
+  "tokens_in": 17851,
+  "tokens_out": 456,
+  "tokens_total": 18307,
+  "cost": 0.00230172,
+  "error": null,
+  "doi_checks": [
+    {
+      "doi": "10.1038/nrd.2016.268",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1038/nrc3236",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1007/s11095-006-9132-0",
+      "resolves_openaire": true,
+      "resolves_crossref": true,
+      "fabricated": false,
+      "cached": false
+    },
+    {
+      "doi": "10.1001/jama.2020.17598",
+      "resolves_openaire": true,
+      "resolves_crossref": true,
+      "fabricated": false,
+      "cached": false
+    },
+    {
+      "doi": "10.1158/0008-5472.can-08-1776",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    }
+  ],
+  "resolution_errors": []
+}

@@ -1,0 +1,99 @@
+{
+  "config": "C",
+  "qid": "q11",
+  "topic": "viral-vector gene therapy",
+  "question": "What are the most influential papers on viral-vector gene therapy? Return 5 with DOIs and citation counts.",
+  "model": "google/gemma-4-26b-a4b-it",
+  "context": "engineered",
+  "tool_calls": [
+    {
+      "turn": 1,
+      "name": "openaire_search_research_products",
+      "args": {
+        "detail": "minimal",
+        "page_size": 10,
+        "query": "viral-vector gene therapy",
+        "sort_by": "citationCount DESC"
+      },
+      "n_results": 10,
+      "cached": false,
+      "ok": true
+    }
+  ],
+  "final_text": "{\"answer\":\"The most influential papers on viral-vector gene therapy, based on citation counts, include foundational work on lentiviral vectors for stable transduction, AAV-mediated liver transduction for hemophilia, and single-dose gene-replacement therapy for spinal muscular atrophy.\",\"citations\":[{\"doi\":\"10.1126/science.272.5259.263\",\"title\":\"In Vivo Gene Delivery and Stable Transduction of Nondividing Cells by a Lentiviral Vector\",\"citation_count\":4530},{\"doi\":\"10.1038/nm1358\",\"title\":\"Successful transduction of liver in hemophilia by AAV-Factor IX and limitations imposed by the host immune response\",\"citation_count\":1968},{\"doi\":\"10.1056/nejmoa1706198\",\"title\":\"Single-Dose Gene-Replacement Therapy for Spinal Muscular Atrophy\",\"citation_count\":1923},{\"doi\":\"10.1128/jvi.72.3.2224-2232.1998\",\"title\":\"Production of High-Titer Recombinant Adeno-Associated Virus Vectors in the Absence of Helper Adenovirus\",\"citation_count\":1255},{\"doi\":\"10.1128/jvi.72.2.1438-1445.1998\",\"title\":\"Membrane-Associated Heparan Sulfate Proteoglycan Is a Receptor for Adeno-Associated Virus Type 2 Virions\",\"citation_count\":1217}]}",
+  "parsed": {
+    "answer": "The most influential papers on viral-vector gene therapy, based on citation counts, include foundational work on lentiviral vectors for stable transduction, AAV-mediated liver transduction for hemophilia, and single-dose gene-replacement therapy for spinal muscular atrophy.",
+    "citations": [
+      {
+        "doi": "10.1126/science.272.5259.263",
+        "title": "In Vivo Gene Delivery and Stable Transduction of Nondividing Cells by a Lentiviral Vector",
+        "citation_count": 4530
+      },
+      {
+        "doi": "10.1038/nm1358",
+        "title": "Successful transduction of liver in hemophilia by AAV-Factor IX and limitations imposed by the host immune response",
+        "citation_count": 1968
+      },
+      {
+        "doi": "10.1056/nejmoa1706198",
+        "title": "Single-Dose Gene-Replacement Therapy for Spinal Muscular Atrophy",
+        "citation_count": 1923
+      },
+      {
+        "doi": "10.1128/jvi.72.3.2224-2232.1998",
+        "title": "Production of High-Titer Recombinant Adeno-Associated Virus Vectors in the Absence of Helper Adenovirus",
+        "citation_count": 1255
+      },
+      {
+        "doi": "10.1128/jvi.72.2.1438-1445.1998",
+        "title": "Membrane-Associated Heparan Sulfate Proteoglycan Is a Receptor for Adeno-Associated Virus Type 2 Virions",
+        "citation_count": 1217
+      }
+    ]
+  },
+  "parse_error": null,
+  "turns": 2,
+  "tokens_in": 3594,
+  "tokens_out": 397,
+  "tokens_total": 3991,
+  "cost": 0.0005702299999999999,
+  "error": null,
+  "doi_checks": [
+    {
+      "doi": "10.1126/science.272.5259.263",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1038/nm1358",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1056/nejmoa1706198",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1128/jvi.72.3.2224-2232.1998",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    },
+    {
+      "doi": "10.1128/jvi.72.2.1438-1445.1998",
+      "fabricated": false,
+      "resolves_crossref": true,
+      "resolves_openaire": true,
+      "cached": true
+    }
+  ],
+  "resolution_errors": []
+}
