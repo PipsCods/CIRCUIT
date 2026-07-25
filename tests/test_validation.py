@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from circuit import validation
+from circuit import contexts, validation
 
 
 def valid_output():
@@ -107,6 +107,16 @@ class ContractTest(unittest.TestCase):
         )
         self.assertIn("$.page_size:type", errors)
         self.assertIn("$.type[0]:enum", errors)
+
+    def test_engineered_schema_enforces_the_citation_ranked_minimal_call(self):
+        context = contexts.engineered()
+        self.assertEqual(len(context.tools), 1)
+        parameters = context.tools[0]["function"]["parameters"]
+        self.assertEqual(
+            set(parameters["required"]),
+            {"query", "page_size", "sort_by", "detail"},
+        )
+        self.assertNotIn("influence_class", parameters["properties"])
 
 
 if __name__ == "__main__":

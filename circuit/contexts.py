@@ -49,8 +49,7 @@ result set. Start with the topic's 2-3 essential keywords; never expand it with
 lists of synonyms.
 2. Search with page_size=10, detail="minimal", and citationCount DESC. Minimal
 results already contain DOI, title, and citation count; use them directly when
-at least five complete DOI-bearing records are available. Prefer influence
-class C3 only when field/age-normalized impact is specifically useful.
+at least five complete DOI-bearing records are available.
 3. Skip incomplete records and continue down the ranked results. If fewer than
 five complete records are available, remove query terms and retry. Make at most
 two shorter-query retries.
@@ -149,50 +148,12 @@ def engineered():
                             "missing required field."
                         ),
                     },
-                    "influence_class": {
-                        "type": "array",
-                        "items": {"type": "string", "enum": ["C3"]},
-                        "description": "Optional top-1% influence filter.",
-                    },
                 },
-                "required": ["query"],
+                "required": ["query", "page_size", "sort_by", "detail"],
             },
         },
     }
-    influence = {
-        "type": "function",
-        "function": {
-            "name": config.T_INFLUENCE,
-            "description": (
-                "Find field- and age-normalized influential OpenAIRE records. "
-                "C3 is the useful top-1% default; C1/C2 are often empty for "
-                "niche topics. Query terms use strict AND logic, so shorten a "
-                "zero-result query."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "influence_class": {
-                        "type": "string",
-                        "enum": ["C3"],
-                        "description": "Use C3 (top 1%).",
-                    },
-                    "query": {
-                        "type": "string",
-                        "description": "2-3 essential AND-combined keywords.",
-                    },
-                    "page_size": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 10,
-                        "description": "Number of results; use 10.",
-                    },
-                },
-                "required": ["influence_class", "query"],
-            },
-        },
-    }
-    return Context("engineered", ENGINEERED_PROMPT, [search, influence])
+    return Context("engineered", ENGINEERED_PROMPT, [search])
 
 
 NAIVE = naive
