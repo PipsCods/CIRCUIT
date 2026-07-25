@@ -1,0 +1,56 @@
+{
+  "benchmark": "Frozen 25-question Gemma 4 / Opus 4.8 / OpenAIRE comparison",
+  "note": "Authoritative scored summary for the demo. Strict JSON is measured on the raw model response; record grounding is available only for MCP-backed configurations. J is intrinsic Opus, so it is an evidence-access contrast rather than a like-for-like MCP comparison.",
+  "configs": {
+    "A": {
+      "config": "A",
+      "method": "Naive MCP",
+      "strict_json": 0.44,
+      "gold_recall_at_5": 0.632,
+      "doi_validity": 1.0,
+      "zero_result_rate": 0.0,
+      "record_grounded": 1.0,
+      "mean_tokens": 9035,
+      "total_cost": 0.029515,
+      "cost_per_verified": 0.000236
+    },
+    "C": {
+      "config": "C",
+      "method": "Engineered MCP",
+      "strict_json": 0.96,
+      "gold_recall_at_5": 0.68,
+      "doi_validity": 1.0,
+      "zero_result_rate": 0.0,
+      "record_grounded": 0.992,
+      "mean_tokens": 4187,
+      "total_cost": 0.015013,
+      "cost_per_verified": 0.000121
+    },
+    "G": {
+      "config": "G",
+      "method": "Intrinsic / no tools",
+      "strict_json": 0.8,
+      "gold_recall_at_5": 0.024,
+      "doi_validity": 0.44,
+      "zero_result_rate": null,
+      "record_grounded": null,
+      "mean_tokens": 693,
+      "total_cost": 0.004183,
+      "cost_per_verified": null
+    },
+    "J": {
+      "config": "J",
+      "method": "Intrinsic / no tools",
+      "json_parse": 1.0,
+      "strict_json": 0.96,
+      "gold_recall_at_5": 0.28,
+      "doi_presence": 0.96,
+      "doi_validity": 0.967,
+      "zero_result_rate": null,
+      "record_grounded": null,
+      "mean_tokens": null,
+      "total_cost": 0.325495,
+      "cost_per_verified": null
+    }
+  }
+}
