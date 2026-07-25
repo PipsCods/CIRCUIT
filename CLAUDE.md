@@ -31,6 +31,7 @@ resolves or it does not — so the hallucination rate is a string lookup, not a 
 | Gemma 4 (26B-A4B)  | **A** floor   | **C** our product  | **G**           |
 | Claude Sonnet 4.6  | **B** the bar | **D** headroom     | **H**           |
 | Claude Fable 5     | **E** optional | **F** optional     | **I**           |
+| Claude Opus 4.8    | —             | —                  | **J**           |
 
 Target result: **C >= B on accuracy, at far below B's cost.** D shows the technique is
 not overfit to Gemma.
@@ -38,12 +39,15 @@ not overfit to Gemma.
 Config A/B must be a *fair* naive baseline — real out-of-the-box MCP tool descriptions
 plus a sensible one-paragraph prompt. Not a strawman. We say this out loud in the pitch.
 
-Configs G/H/I expose no tools and test only knowledge stored in each model. They use the
-same frozen questions, decoding parameters, raw JSON output contract, trace files, and
-deterministic scorer as the retrieval conditions. DOI resolution happens only after the
-answer is complete and is never returned to the model. Citation counts remain required
-output, but count accuracy is not scored because the frozen gold set contains DOI/title
-ground truth only. Zero-result call rate is N/A because no retrieval call is attempted.
+Configs G/H/I/J expose no tools and test only knowledge stored in each model. They use
+the same frozen questions, raw JSON output contract, trace files, and deterministic
+scorer as the retrieval conditions. DOI resolution happens only after the answer is
+complete and is never returned to the model. Citation counts remain required output,
+but count accuracy is not scored because the frozen gold set contains DOI/title ground
+truth only. Zero-result call rate is N/A because no retrieval call is attempted.
+
+Fable 5's biology classifier refuses the frozen life-science question set. Config J is
+the direct Opus 4.8 intrinsic-only comparison used in the final four-arm G/A/C/J run.
 
 ## Metrics
 
@@ -81,6 +85,10 @@ Fable 5 is an optional additional comparison, not part of the core A-D claim. It
 does not accept `temperature=0`, so the harness omits that unsupported parameter for
 configs E/F. It also preserves adaptive-thinking blocks across tool turns and reports
 classifier refusals as run errors rather than silently falling back to another model.
+
+Opus 4.8 is the intrinsic-only replacement for the refused Fable comparison. Config J
+also omits the unsupported `temperature=0` parameter and records the absence of a seed
+in its manifest.
 
 ## Layout
 

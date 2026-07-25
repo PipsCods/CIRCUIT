@@ -50,11 +50,13 @@ ANTHROPIC_BASE_URL = DOTENV.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com
 SMALL = "google/gemma-4-26b-a4b-it"      # via OpenRouter
 LARGE = "claude-sonnet-4-6"              # via the Anthropic SDK
 FABLE = "claude-fable-5"                 # via the Anthropic SDK
+OPUS = "claude-opus-4-8"                 # via the Anthropic SDK
 
 PROVIDER = {
     SMALL: "openrouter",
     LARGE: "anthropic",
     FABLE: "anthropic",
+    OPUS: "anthropic",
 }
 
 # USD per token. The OpenRouter entries are re-verified against the live models
@@ -64,11 +66,12 @@ PRICES = {
     SMALL: {"in": 0.00000012, "out": 0.00000035},
     LARGE: {"in": 0.000003, "out": 0.000015},
     FABLE: {"in": 0.000010, "out": 0.000050},
+    OPUS: {"in": 0.000005, "out": 0.000025},
 }
 
-# Fable 5 has always-on adaptive thinking and rejects temperature values other
-# than 1.0. Omitting the parameter uses its only supported sampling behavior.
-NO_TEMPERATURE = {FABLE}
+# Fable 5 has always-on adaptive thinking. Fable 5 and Opus 4.8 reject
+# non-default temperature values, so omit the parameter for both models.
+NO_TEMPERATURE = {FABLE, OPUS}
 
 SEED = 20260725
 TEMPERATURE = 0.0

@@ -74,6 +74,12 @@ class FableProviderTest(unittest.TestCase):
         self.assertEqual(CONFIGS["E"], (config.FABLE, contexts.NAIVE))
         self.assertEqual(CONFIGS["F"], (config.FABLE, contexts.ENGINEERED))
 
+    def test_opus_intrinsic_config_and_pricing(self):
+        self.assertEqual(config.PROVIDER[config.OPUS], "anthropic")
+        self.assertEqual(config.PRICES[config.OPUS],
+                         {"in": 0.000005, "out": 0.000025})
+        self.assertEqual(CONFIGS["J"], (config.OPUS, contexts.INTRINSIC))
+
     def test_fable_omits_unsupported_temperature_and_keeps_thinking(self):
         reply = llm.chat(
             config.FABLE,
@@ -140,6 +146,14 @@ class FableProviderTest(unittest.TestCase):
             temperature=0.0,
         )
         self.assertEqual(self.client.messages.kwargs["temperature"], 0.0)
+
+    def test_opus_omits_unsupported_temperature(self):
+        llm.chat(
+            config.OPUS,
+            [{"role": "user", "content": "Find papers."}],
+            temperature=0.0,
+        )
+        self.assertNotIn("temperature", self.client.messages.kwargs)
 
 
 if __name__ == "__main__":

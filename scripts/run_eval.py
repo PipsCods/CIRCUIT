@@ -24,6 +24,7 @@ CONFIGS = {
     "G": (config.SMALL, contexts.INTRINSIC),
     "H": (config.LARGE, contexts.INTRINSIC),
     "I": (config.FABLE, contexts.INTRINSIC),
+    "J": (config.OPUS, contexts.INTRINSIC),
 }
 RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 

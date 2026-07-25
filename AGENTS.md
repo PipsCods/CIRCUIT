@@ -30,6 +30,8 @@ resolves or it does not — so the hallucination rate is a string lookup, not a 
 | ------------------ | ------------- | ------------------ | -------------- |
 | Gemma 4 (26B-A4B)  | **A** floor   | **C** our product  | **G**           |
 | Claude Sonnet 4.6  | **B** the bar | **D** headroom     | **H**           |
+| Claude Fable 5     | **E** optional | **F** optional     | **I**           |
+| Claude Opus 4.8    | —             | —                  | **J**           |
 
 Target result: **C >= B on accuracy, at far below B's cost.** D shows the technique is
 not overfit to Gemma.
@@ -37,12 +39,15 @@ not overfit to Gemma.
 Config A/B must be a *fair* naive baseline — real out-of-the-box MCP tool descriptions
 plus a sensible one-paragraph prompt. Not a strawman. We say this out loud in the pitch.
 
-Config G exposes no tools and tests only knowledge stored in Gemma. It uses the same
-frozen questions, decoding parameters, raw JSON output contract, trace files, and
-deterministic scorer as A/C. DOI resolution happens only after the answer is complete and
-is never returned to the model. Citation counts remain required output, but count
-accuracy is not scored because the frozen gold set contains DOI/title ground truth only.
-Zero-result call rate is N/A because no retrieval call is attempted.
+Configs G/H/I/J expose no tools and test only knowledge stored in each model. They use
+the same frozen questions, raw JSON output contract, trace files, and deterministic
+scorer as the retrieval conditions. DOI resolution happens only after the answer is
+complete and is never returned to the model. Citation counts remain required output,
+but count accuracy is not scored because the frozen gold set contains DOI/title ground
+truth only. Zero-result call rate is N/A because no retrieval call is attempted.
+
+Fable 5's biology classifier refuses the frozen life-science question set. Config J is
+the direct Opus 4.8 intrinsic-only comparison used in the final four-arm G/A/C/J run.
 
 ## Metrics
 
@@ -61,12 +66,14 @@ All deterministic, all computed by `circuit/score.py`.
 
 These are non-negotiable — the whole pitch rests on reproducibility.
 
-- `temperature=0`, fixed `seed`, fixed question order.
+- `temperature=0` where supported, fixed question order, and a fixed `seed` where the
+  provider offers one. Fable 5 and Opus 4.8 reject non-default temperature values, so
+  the harness omits that parameter for configs I/J.
 - **Every MCP call is disk-cached** keyed on `sha256(tool + sorted args)`. Reruns are
   instant, identical, and work with no network. The demo survives venue wifi dying.
 - Every DOI resolution is disk-cached the same way.
-- Both models are called through **the same OpenRouter client** with the same params.
-  Uniform API surface removes a confound and gives one consistent price table.
+- Gemma 4 is called through OpenRouter; Claude models use the official Anthropic SDK.
+  The manifest records the provider, actual model, and supported generation parameters.
 
 ## Layout
 

@@ -332,7 +332,7 @@ def _load_rows(run_id=None):
     else:
         candidates = [
             (name, config.RUNS / name)
-            for name in ("A", "B", "C", "D", "E", "F", "G", "H", "I")
+            for name in ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
             if (config.RUNS / name).exists()
         ]
 

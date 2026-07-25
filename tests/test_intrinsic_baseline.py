@@ -16,6 +16,9 @@ class IntrinsicBaselineTest(unittest.TestCase):
         self.assertEqual(
             run_eval.CONFIGS["I"], (config.FABLE, contexts.INTRINSIC)
         )
+        self.assertEqual(
+            run_eval.CONFIGS["J"], (config.OPUS, contexts.INTRINSIC)
+        )
 
     def test_intrinsic_context_reuses_output_contract_without_tools(self):
         context = contexts.INTRINSIC()

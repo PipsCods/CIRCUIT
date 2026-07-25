@@ -1,9 +1,9 @@
 """Unified chat interface over OpenRouter and Anthropic.
 
-Gemma 4 goes through OpenRouter; Claude Sonnet 4.6 and Claude Fable 5 go through
-the Anthropic SDK. Messages and tools are written once in OpenAI shape (the
-canonical form for this harness) and translated for Anthropic here, so the
-runner never branches on provider.
+Gemma 4 goes through OpenRouter; Claude Sonnet 4.6, Claude Fable 5, and Claude
+Opus 4.8 go through the Anthropic SDK. Messages and tools are written once in
+OpenAI shape (the canonical form for this harness) and translated for Anthropic
+here, so the runner never branches on provider.
 
 Caveat we state openly in the writeup: the Anthropic API has no `seed`
 parameter, so Sonnet's determinism rests on temperature=0 alone, while Gemma is
@@ -152,7 +152,7 @@ def _parse_args(raw):
 
 
 # --------------------------------------------------------------------------- #
-# Anthropic (Claude Sonnet 4.6 and Claude Fable 5)
+# Anthropic (Claude Sonnet 4.6, Claude Fable 5, and Claude Opus 4.8)
 # --------------------------------------------------------------------------- #
 
 _client = None
