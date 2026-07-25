@@ -12,28 +12,49 @@ for _d in (CACHE / "mcp", CACHE / "doi", SECRETS, RUNS, DATA):
     _d.mkdir(parents=True, exist_ok=True)
 
 
-def _load_dotenv():
+def _read_dotenv() -> dict:
     env = ROOT / ".env"
     if not env.exists():
-        return
+        return {}
+    out = {}
     for line in env.read_text().splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
         k, v = line.split("=", 1)
-        os.environ.setdefault(k.strip(), v.strip().strip("'\""))
+        out[k.strip()] = v.strip().strip("'\"")
+    return out
 
 
-_load_dotenv()
+DOTENV = _read_dotenv()
 
-OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+
+def _cfg(key, default=""):
+    """.env wins over the inherited shell.
+
+    Deliberate: a developer shell may already export ANTHROPIC_* for some other
+    tool, and silently picking that up would point the harness at the wrong
+    account or gateway mid-experiment.
+    """
+    return DOTENV.get(key) or os.environ.get(key, default)
+
+
+OPENROUTER_KEY = _cfg("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-SMALL = "google/gemma-4-26b-a4b-it"
-LARGE = "anthropic/claude-sonnet-4.6"
+ANTHROPIC_KEY = _cfg("ANTHROPIC_API_KEY")
+# Only honoured from .env — never inherited, so a stray shell export cannot
+# redirect billed traffic to a proxy without us noticing.
+ANTHROPIC_BASE_URL = DOTENV.get("ANTHROPIC_BASE_URL", "https://api.anthropic.com")
 
-# USD per token, mirrored from the OpenRouter models endpoint.
-# smoke.py re-verifies these against the live API so they cannot silently drift.
+SMALL = "google/gemma-4-26b-a4b-it"      # via OpenRouter
+LARGE = "claude-sonnet-4-6"              # via the Anthropic SDK
+
+PROVIDER = {SMALL: "openrouter", LARGE: "anthropic"}
+
+# USD per token. The OpenRouter entries are re-verified against the live models
+# endpoint by smoke.py; the Anthropic entry is list pricing and is checked by
+# hand. Cache reads/writes are not modelled — we do not use prompt caching.
 PRICES = {
     SMALL: {"in": 0.00000012, "out": 0.00000035},
     LARGE: {"in": 0.000003, "out": 0.000015},

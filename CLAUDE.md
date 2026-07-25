@@ -54,19 +54,27 @@ All deterministic, all computed by `circuit/score.py`.
 
 These are non-negotiable — the whole pitch rests on reproducibility.
 
-- `temperature=0`, fixed `seed`, fixed question order.
+- `temperature=0`, fixed question order, and a fixed `seed` where the provider offers one.
 - **Every MCP call is disk-cached** keyed on `sha256(tool + sorted args)`. Reruns are
   instant, identical, and work with no network. The demo survives venue wifi dying.
 - Every DOI resolution is disk-cached the same way.
-- Both models are called through **the same OpenRouter client** with the same params.
-  Uniform API surface removes a confound and gives one consistent price table.
+
+**Known asymmetry, stated openly.** Gemma 4 goes through OpenRouter, Claude Sonnet 4.6
+through the official Anthropic SDK — two providers, not one. The Anthropic API exposes no
+`seed`, so Sonnet is temperature-0 only and its numbers may drift slightly between runs,
+while Gemma is both seeded and temperature-0. Sonnet is the *baseline being compared
+against*, not the subject of the intervention, so this does not threaten the claim. Say it
+out loud in the pitch rather than letting a judge find it.
+
+`circuit/llm.py` hides the split: messages and tools are always authored in OpenAI shape
+and translated for Anthropic, so the runner never branches on provider.
 
 ## Layout
 
 ```
 circuit/
-  config.py       models, price table, paths
-  llm.py          OpenRouter chat client -> (text, tool_calls, usage, cost)
+  config.py       models, providers, price table, paths
+  llm.py          chat() over OpenRouter + Anthropic -> (text, tool_calls, usage, cost)
   oauth.py        OpenAIRE OAuth: token load / refresh
   mcp_client.py   MCP JSON-RPC over streamable HTTP, disk-cached
 scripts/
@@ -78,11 +86,17 @@ scripts/
 
 ## Setup
 
+The Anthropic SDK is a hard requirement, and macOS system Python is PEP-668 locked, so
+everything runs out of `.venv`.
+
 ```bash
-cp .env.example .env      # add OPENROUTER_API_KEY
-python3 scripts/auth_openaire.py    # one-time, opens browser
-python3 scripts/smoke.py            # must print ALL CHECKS PASSED
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+cp .env.example .env      # add OPENROUTER_API_KEY and ANTHROPIC_API_KEY
+.venv/bin/python scripts/auth_openaire.py   # one-time, opens browser
+.venv/bin/python scripts/smoke.py           # must print ALL CHECKS PASSED
 ```
+
+Always invoke scripts with `.venv/bin/python`, not `python3`.
 
 ## Gotchas that cost us time — do not rediscover these
 
