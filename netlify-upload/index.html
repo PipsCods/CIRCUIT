@@ -9,7 +9,7 @@
     content="CIRCUIT compiles MCP workflows into reliable, model-specific contracts and selects the lowest-cost model that meets the target."
   >
   <title>CIRCUIT — The optimization control plane for MCP workflows</title>
-  <link rel="stylesheet" href="./styles.css?v=live-compiler-v3">
+  <link rel="stylesheet" href="./styles.css?v=architecture-hero-v1">
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -24,76 +24,135 @@
       <a href="#product">Product</a>
       <a href="#savings">Savings</a>
       <a href="#proof">Measured proof</a>
-      <a href="#trace">Trace</a>
       <a href="#platform">Platform</a>
     </nav>
     <span class="evidence-state"><i aria-hidden="true"></i>offline product demo</span>
   </header>
 
   <main>
-    <section class="hero chapter" id="product" aria-labelledby="hero-heading">
-      <div class="hero-copy">
-        <p class="kicker">MCP OPTIMIZATION CONTROL PLANE</p>
-        <h1 id="hero-heading">
-          See an MCP workflow become
-          <span>small-model ready.</span>
-        </h1>
-        <p class="lede">
-          CIRCUIT turns raw tool schemas, workflow intent, and known failures into
-          a tested contract Gemma can execute reliably. The compiler is running
-          beside you now.
-        </p>
-        <div class="hero-actions">
-          <button class="button button-primary" id="hero-compile" type="button">
-            <span aria-hidden="true">↻</span>
-            Replay compilation
-          </button>
-          <a class="button button-secondary" href="#proof">See measured proof</a>
+    <section class="product-hero chapter" id="product" aria-labelledby="hero-heading">
+      <header class="product-hero-intro">
+        <div>
+          <p class="kicker">CIRCUIT · COMPILED MCP SPECIALISTS</p>
+          <h1 id="hero-heading">
+            Keep the orchestrator.
+            <span>Delegate MCP work to compiled specialists.</span>
+          </h1>
         </div>
-        <div class="hero-foot">
-          <span>Fictional workflow</span>
-          <span>Deterministic UI replay</span>
-          <span>No live MCP writes</span>
+        <p>
+          Install one adapter. CIRCUIT investigates the live MCP surface, builds
+          tested Gemma specialists, and gives your orchestrator three high-level tools.
+        </p>
+      </header>
+
+      <div class="onboarding-shell" id="onboarding-shell" data-phase="install" aria-live="polite">
+        <div class="onboarding-toolbar">
+          <div>
+            <span>ILLUSTRATIVE TARGET PRODUCT</span>
+            <strong id="onboarding-status">Preparing the CIRCUIT adapter…</strong>
+          </div>
+          <button class="onboarding-replay" id="onboarding-replay" type="button">
+            <span aria-hidden="true">↻</span>
+            Replay setup
+          </button>
+        </div>
+
+        <ol class="onboarding-phases" id="onboarding-phases" aria-label="CIRCUIT setup phases"></ol>
+
+        <div class="onboarding-stage">
+          <section class="onboarding-inspector" aria-labelledby="phase-title">
+            <header>
+              <span id="phase-kicker">01 · INSTALL</span>
+              <b id="phase-provenance">ILLUSTRATIVE TARGET SDK</b>
+            </header>
+            <h2 id="phase-title">Connect CIRCUIT to the agent service.</h2>
+            <p id="phase-copy">
+              Add the runtime adapter and register the existing MCP endpoints.
+            </p>
+            <div class="onboarding-terminal" aria-label="Deterministic setup output">
+              <div><i></i><i></i><i></i><span>circuit setup</span></div>
+              <pre id="phase-terminal"></pre>
+            </div>
+            <div class="onboarding-code" id="onboarding-code" hidden>
+              <header><span>agent.py</span><b>ILLUSTRATIVE TARGET SDK</b></header>
+              <pre><code id="phase-code"></code></pre>
+            </div>
+          </section>
+
+          <section class="architecture-panel" aria-label="CIRCUIT architecture">
+            <div class="architecture-track">
+              <article class="architecture-node orchestrator-card" data-architecture-node="orchestrator">
+                <span>CLIENT</span>
+                <strong>Frontier orchestrator</strong>
+                <small>Plans and delegates with 3 high-level tools.</small>
+                <code>specialists()</code>
+              </article>
+
+              <i class="architecture-link" aria-hidden="true"><b></b></i>
+
+              <button
+                class="architecture-node architecture-action compiler-card"
+                id="platform-compiler-trigger"
+                data-architecture-node="compiler"
+                type="button"
+                aria-describedby="compiler-action-hint"
+              >
+                <span>CIRCUIT · BUILD TIME</span>
+                <strong>CIRCUIT compiler</strong>
+                <small>Intent + schemas + failures → tested contracts.</small>
+                <em id="compiler-action-hint">Open seven-stage compilation ↗</em>
+              </button>
+
+              <i class="architecture-link" aria-hidden="true"><b></b></i>
+
+              <div class="specialist-catalog" data-architecture-node="specialists">
+                <span>COMPILED GEMMA SPECIALISTS</span>
+                <button
+                  class="specialist-card is-recorded"
+                  id="platform-specialist-trigger"
+                  type="button"
+                  aria-describedby="specialist-action-hint"
+                >
+                  <b>Gemma</b>
+                  <span>
+                    <strong>Customer escalation</strong>
+                    <small>v12 · 18 fields · 99.2%</small>
+                    <em id="specialist-action-hint">Open frozen trace ↗</em>
+                  </span>
+                </button>
+                <article class="specialist-card">
+                  <b>Gemma</b>
+                  <span><strong>Account lookup</strong><small>v7 · 12 fields · ready</small></span>
+                </article>
+                <article class="specialist-card">
+                  <b>Gemma</b>
+                  <span><strong>Incident operations</strong><small>v4 · 21 fields · ready</small></span>
+                </article>
+              </div>
+
+              <i class="architecture-link" aria-hidden="true"><b></b></i>
+
+              <article class="architecture-node mcp-card" data-architecture-node="mcps">
+                <span>CLIENT MCPs</span>
+                <strong>Slack · Salesforce · Jira</strong>
+                <small>Credentials and raw contracts remain client-owned.</small>
+                <code>47 tools · 312 fields</code>
+              </article>
+            </div>
+
+            <div class="architecture-result" id="architecture-result">
+              <span>GRAPH STATE</span>
+              <strong id="architecture-status">Adapter installation in progress.</strong>
+              <small>Illustrative architecture · no package publication or live MCP writes.</small>
+            </div>
+          </section>
         </div>
       </div>
 
-      <section class="hero-compiler" id="compiler-console" aria-label="Live CIRCUIT compiler simulation">
-        <header class="console-header">
-          <div class="console-workflow">
-            <span class="console-state-light" aria-hidden="true"></span>
-            <div>
-              <strong>Customer escalation triage</strong>
-              <span>Slack MCP → Salesforce MCP → Jira MCP</span>
-            </div>
-          </div>
-          <div class="console-progress" aria-hidden="true"><i id="compile-progress"></i></div>
-          <div class="console-status">
-            <span id="compile-status" aria-live="polite">READY TO COMPILE</span>
-            <b id="compile-clock">00:00.000</b>
-          </div>
-          <button class="compile-button" id="compile-button" type="button">
-            <span aria-hidden="true">▶</span>
-            Compile workflow
-          </button>
-        </header>
-
-        <div class="hero-compiler-body">
-          <div class="panel-heading">
-            <span>LIVE · CIRCUIT COMPILER</span>
-            <b>Concrete simulated artifacts</b>
-          </div>
-          <div class="compiler-workspace">
-            <ol class="stage-rail" id="stage-rail" aria-label="Compilation stages"></ol>
-            <article class="artifact-inspector" id="artifact-inspector" aria-live="polite">
-              <header class="artifact-header">
-                <span id="artifact-kicker">SCENARIO INPUT</span>
-                <b id="artifact-badge">Illustrative scenario</b>
-              </header>
-              <div class="artifact-content" id="artifact-content"></div>
-            </article>
-          </div>
-        </div>
-      </section>
+      <div class="hero-proof-link">
+        <span>Measured claims stay separate from this product story.</span>
+        <a class="button button-secondary" href="#proof">See frozen OpenAIRE proof</a>
+      </div>
     </section>
 
     <section class="optimizer chapter" id="savings" aria-labelledby="optimizer-heading">
@@ -250,20 +309,6 @@
       </details>
     </section>
 
-    <span class="chapter-anchor" id="trace" aria-hidden="true"></span>
-    <section class="workflow-embed chapter" aria-labelledby="workflow-heading">
-      <header class="workflow-heading">
-        <p class="kicker">ONE FROZEN RUN · END TO END</p>
-        <h2 id="workflow-heading">A real question. <span>Every observable step.</span></h2>
-      </header>
-      <iframe
-        id="workflow-frame"
-        src="./workflow.html?embedded=1"
-        title="CIRCUIT one-screen Gemma workflow"
-        loading="lazy"
-      ></iframe>
-    </section>
-
     <section class="platform chapter" id="platform" aria-labelledby="platform-heading">
       <header class="section-intro platform-intro">
         <p class="kicker">THE PRODUCT MOAT</p>
@@ -318,14 +363,88 @@
     </section>
   </main>
 
+  <dialog class="product-viewer" id="product-viewer" aria-labelledby="viewer-title">
+    <div class="viewer-shell">
+      <header class="viewer-toolbar">
+        <div>
+          <span id="viewer-kicker">CIRCUIT PRODUCT VIEWER</span>
+          <strong id="viewer-title">Compilation inspector</strong>
+        </div>
+        <div class="viewer-actions" role="tablist" aria-label="Viewer mode">
+          <button id="viewer-compiler-tab" type="button" role="tab" aria-controls="viewer-compiler" aria-selected="true">
+            Compiler
+          </button>
+          <button id="viewer-trace-tab" type="button" role="tab" aria-controls="viewer-trace" aria-selected="false">
+            Frozen trace
+          </button>
+          <button class="viewer-close" id="viewer-close" type="button" aria-label="Close product viewer">×</button>
+        </div>
+      </header>
+
+      <section class="viewer-panel" id="viewer-compiler" role="tabpanel" aria-labelledby="viewer-compiler-tab">
+        <section class="hero-compiler" id="compiler-console" aria-label="CIRCUIT compiler simulation">
+          <header class="console-header">
+            <div class="console-workflow">
+              <span class="console-state-light" aria-hidden="true"></span>
+              <div>
+                <strong>Customer escalation triage</strong>
+                <span>Slack MCP → Salesforce MCP → Jira MCP</span>
+              </div>
+            </div>
+            <div class="console-progress" aria-hidden="true"><i id="compile-progress"></i></div>
+            <div class="console-status">
+              <span id="compile-status" aria-live="polite">READY TO COMPILE</span>
+              <b id="compile-clock">00:00.000</b>
+            </div>
+            <button class="compile-button" id="compile-button" type="button">
+              <span aria-hidden="true">▶</span>
+              Compile workflow
+            </button>
+          </header>
+
+          <div class="hero-compiler-body">
+            <div class="panel-heading">
+              <span>ILLUSTRATIVE · CIRCUIT COMPILER</span>
+              <b>Concrete simulated artifacts</b>
+            </div>
+            <div class="compiler-workspace">
+              <ol class="stage-rail" id="stage-rail" aria-label="Compilation stages"></ol>
+              <article class="artifact-inspector" id="artifact-inspector" aria-live="polite">
+                <header class="artifact-header">
+                  <span id="artifact-kicker">SCENARIO INPUT</span>
+                  <b id="artifact-badge">Illustrative scenario</b>
+                </header>
+                <div class="artifact-content" id="artifact-content"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="viewer-panel viewer-trace" id="viewer-trace" role="tabpanel" aria-labelledby="viewer-trace-tab" hidden>
+        <header class="workflow-heading">
+          <p class="kicker">MEASURED OPENAIRE RUN · FROZEN EVIDENCE</p>
+          <h2>A real question. <span>Every observable step.</span></h2>
+        </header>
+        <iframe
+          id="workflow-frame"
+          data-src="./workflow.html?embedded=1"
+          title="CIRCUIT one-screen Gemma workflow"
+          loading="eager"
+        ></iframe>
+      </section>
+    </div>
+  </dialog>
+
+
   <footer class="site-footer">
     <span class="brand">CIRCUIT</span>
     <p>Context compilation and continuous optimization for reliable MCP agents.</p>
     <p>Measured claims use the frozen OpenAIRE benchmark. Company savings are illustrative projections.</p>
   </footer>
 
-  <script src="./demo-data.js?v=live-compiler-v3"></script>
-  <script src="./product-data.js?v=live-compiler-v3"></script>
-  <script src="./app.js?v=live-compiler-v3"></script>
+  <script src="./demo-data.js?v=architecture-hero-v1"></script>
+  <script src="./product-data.js?v=architecture-hero-v1"></script>
+  <script src="./app.js?v=architecture-hero-v1"></script>
 </body>
 </html>

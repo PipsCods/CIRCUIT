@@ -445,7 +445,11 @@
   const compileClock = byId("compile-clock");
   const compileProgress = byId("compile-progress");
   const compilerConsole = byId("compiler-console");
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // The query override lets the offline bundle prove this branch in browsers
+  // that cannot emulate OS-level media preferences.
+  const reducedMotion =
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    || new URLSearchParams(window.location.search).get("motion") === "reduce";
   let timers = [];
   let clockTimer = null;
 
@@ -496,13 +500,11 @@
     });
     renderScenario();
     compilerConsole.classList.remove("is-running", "is-complete");
-    compiledResult.classList.remove("is-ready");
     compileStatus.textContent = "READY TO COMPILE";
     compileClock.textContent = "00:00.000";
     compileProgress.style.width = "0%";
     compileButton.disabled = false;
     compileButton.innerHTML = '<span aria-hidden="true">▶</span> Compile workflow';
-    setText("result-state", "Awaiting compile");
   };
   const completeCompiler = (duration) => {
     clearTimers();
@@ -510,13 +512,11 @@
     renderStageArtifact(product.stages.length - 1);
     compilerConsole.classList.remove("is-running");
     compilerConsole.classList.add("is-complete");
-    compiledResult.classList.add("is-ready");
     compileStatus.textContent = "COMPILE COMPLETE · RELIABILITY TARGET PASSED";
     compileClock.textContent = formatClock(duration);
     compileProgress.style.width = "100%";
     compileButton.disabled = false;
     compileButton.innerHTML = '<span aria-hidden="true">↻</span> Replay compilation';
-    setText("result-state", "Target passed");
   };
   const runCompiler = () => {
     resetCompiler();
@@ -549,29 +549,265 @@
   };
 
   compileButton.addEventListener("click", runCompiler);
-  byId("hero-compile").addEventListener("click", runCompiler);
   resetCompiler();
-  window.setTimeout(runCompiler, reducedMotion ? 0 : 650);
+  compiledResult.classList.add("is-ready");
+  setText("result-state", "Target passed");
 
-  const workflowFrame = byId("workflow-frame");
-  if (workflowFrame && "IntersectionObserver" in window) {
-    let frameReady = false;
-    let replayRequested = false;
-    const requestWorkflowReplay = () => {
-      if (!frameReady || !workflowFrame.contentWindow) return;
-      workflowFrame.contentWindow.postMessage({ type: "circuit:replay" }, "*");
-    };
-    workflowFrame.addEventListener("load", () => {
-      frameReady = true;
-      if (replayRequested) requestWorkflowReplay();
+  const onboarding = product.onboarding;
+  const onboardingShell = byId("onboarding-shell");
+  const onboardingPhases = byId("onboarding-phases");
+  const onboardingReplay = byId("onboarding-replay");
+  const phaseTerminal = byId("phase-terminal");
+  const phaseCode = byId("phase-code");
+  const onboardingCode = byId("onboarding-code");
+  const architectureNodes = Array.from(
+    document.querySelectorAll("[data-architecture-node]")
+  );
+  const architectureLinks = Array.from(
+    document.querySelectorAll(".architecture-link")
+  );
+  let onboardingTimers = [];
+  let onboardingFinished = false;
+  let selectedOnboardingPhase = 0;
+
+  const clearOnboardingTimers = () => {
+    onboardingTimers.forEach((timer) => window.clearTimeout(timer));
+    onboardingTimers = [];
+  };
+
+  onboarding.phases.forEach((phase, index) => {
+    const item = document.createElement("li");
+    item.innerHTML = `
+      <button type="button" data-onboarding-phase="${index}" aria-pressed="false" disabled>
+        <span>${String(index + 1).padStart(2, "0")}</span>
+        <strong>${escapeHtml(phase.label)}</strong>
+        <small>${escapeHtml(phase.status)}</small>
+        <b>QUEUED</b>
+      </button>
+    `;
+    onboardingPhases.appendChild(item);
+  });
+
+  const onboardingButtons = Array.from(
+    onboardingPhases.querySelectorAll("[data-onboarding-phase]")
+  );
+
+  const setOnboardingButtonStates = (activeIndex, playing) => {
+    onboardingButtons.forEach((button, index) => {
+      const state = index < activeIndex
+        ? "DONE"
+        : index === activeIndex
+          ? playing ? "RUNNING" : "SELECTED"
+          : onboardingFinished ? "READY" : "QUEUED";
+      button.classList.toggle("is-active", index === activeIndex);
+      button.classList.toggle("is-complete", index < activeIndex || onboardingFinished);
+      button.setAttribute("aria-pressed", String(index === activeIndex));
+      button.disabled = !onboardingFinished;
+      button.querySelector(":scope > b").textContent = state;
     });
-    const workflowObserver = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        replayRequested = true;
-        requestWorkflowReplay();
-        workflowObserver.disconnect();
+  };
+
+  const renderOnboardingPhase = (index, { playing = false } = {}) => {
+    const phase = onboarding.phases[index];
+    if (!phase) return;
+    selectedOnboardingPhase = index;
+    onboardingShell.dataset.phase = phase.id;
+    setText("phase-kicker", `${String(index + 1).padStart(2, "0")} · ${phase.label.toUpperCase()}`);
+    setText("phase-title", phase.heading);
+    setText("phase-copy", phase.copy);
+    setText("onboarding-status", playing ? phase.status : `Inspecting · ${phase.status}`);
+    setText("architecture-status", phase.graph_status);
+    phaseTerminal.textContent = phase.terminal.join("\n");
+    onboardingCode.hidden = !phase.show_code;
+    phaseCode.textContent = phase.show_code ? onboarding.snippet : "";
+
+    architectureNodes.forEach((node) => {
+      const isActive = phase.active_nodes.includes(node.dataset.architectureNode);
+      node.classList.toggle("is-active", isActive);
+      node.classList.toggle("is-complete", onboardingFinished || index === onboarding.phases.length - 1);
+    });
+    architectureLinks.forEach((link, linkIndex) => {
+      link.classList.toggle("is-active", playing && linkIndex === Math.min(index, architectureLinks.length - 1));
+      link.classList.toggle("is-complete", onboardingFinished || linkIndex < index);
+    });
+    byId("architecture-result").classList.toggle(
+      "is-complete",
+      onboardingFinished || index === onboarding.phases.length - 1
+    );
+    setOnboardingButtonStates(index, playing);
+  };
+
+  const finishOnboarding = () => {
+    clearOnboardingTimers();
+    onboardingFinished = true;
+    onboardingShell.classList.remove("is-playing");
+    onboardingShell.classList.add("is-complete");
+    renderOnboardingPhase(onboarding.phases.length - 1);
+    setText("onboarding-status", "Setup complete · 3 specialist tools ready");
+    onboardingReplay.disabled = false;
+  };
+
+  const playOnboarding = () => {
+    clearOnboardingTimers();
+    onboardingFinished = false;
+    onboardingShell.classList.remove("is-complete");
+    onboardingShell.classList.add("is-playing");
+    onboardingReplay.disabled = true;
+    renderOnboardingPhase(0, { playing: true });
+
+    if (reducedMotion) {
+      finishOnboarding();
+      return;
+    }
+
+    const phaseTimes = [0, 1650, 3400, 5200];
+    phaseTimes.slice(1).forEach((delay, offset) => {
+      onboardingTimers.push(window.setTimeout(
+        () => renderOnboardingPhase(offset + 1, { playing: true }),
+        delay
+      ));
+    });
+    onboardingTimers.push(window.setTimeout(finishOnboarding, onboarding.duration_ms));
+  };
+
+  onboardingButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!onboardingFinished) return;
+      clearOnboardingTimers();
+      renderOnboardingPhase(Number(button.dataset.onboardingPhase));
+    });
+    button.addEventListener("keydown", (event) => {
+      if (
+        onboardingFinished
+        && (event.key === "Enter" || event.key === " ")
+      ) {
+        event.preventDefault();
+        clearOnboardingTimers();
+        renderOnboardingPhase(Number(button.dataset.onboardingPhase));
       }
-    }, { threshold: 0.45 });
-    workflowObserver.observe(workflowFrame);
-  }
+    });
+  });
+  onboardingReplay.addEventListener("click", playOnboarding);
+  renderOnboardingPhase(0, { playing: true });
+  window.setTimeout(playOnboarding, reducedMotion ? 0 : 260);
+
+  const viewer = byId("product-viewer");
+  const viewerClose = byId("viewer-close");
+  const compilerTab = byId("viewer-compiler-tab");
+  const traceTab = byId("viewer-trace-tab");
+  const compilerPanel = byId("viewer-compiler");
+  const tracePanel = byId("viewer-trace");
+  const compilerTrigger = byId("platform-compiler-trigger");
+  const specialistTrigger = byId("platform-specialist-trigger");
+  const workflowFrame = byId("workflow-frame");
+  let viewerMode = "compiler";
+  let focusReturnTarget = null;
+  let frameReady = false;
+  let replayRequested = false;
+
+  const requestWorkflowReplay = () => {
+    replayRequested = true;
+    if (!frameReady || !workflowFrame.contentWindow) return;
+    workflowFrame.contentWindow.postMessage({ type: "circuit:replay" }, "*");
+  };
+
+  const stopWorkflow = () => {
+    replayRequested = false;
+    frameReady = false;
+    workflowFrame.src = "about:blank";
+  };
+
+  workflowFrame.addEventListener("load", () => {
+    if (workflowFrame.src === "about:blank" || viewerMode !== "trace" || !viewer.open) return;
+    frameReady = true;
+    requestWorkflowReplay();
+  });
+
+  const setViewerMode = (mode) => {
+    viewerMode = mode;
+    clearTimers();
+    resetCompiler();
+    stopWorkflow();
+
+    const compilerActive = mode === "compiler";
+    compilerPanel.hidden = !compilerActive;
+    tracePanel.hidden = compilerActive;
+    compilerTab.setAttribute("aria-selected", String(compilerActive));
+    traceTab.setAttribute("aria-selected", String(!compilerActive));
+    setText("viewer-title", compilerActive
+      ? "Compilation inspector"
+      : "A real question. Every observable step.");
+    setText("viewer-kicker", compilerActive
+      ? "ILLUSTRATIVE PRODUCT ARTIFACTS"
+      : "MEASURED OPENAIRE TRACE");
+
+    if (compilerActive) {
+      runCompiler();
+    } else {
+      replayRequested = true;
+      workflowFrame.src = workflowFrame.dataset.src;
+    }
+  };
+
+  const openViewer = (mode, trigger) => {
+    focusReturnTarget = trigger;
+    if (!viewer.open) viewer.showModal();
+    setViewerMode(mode);
+    window.setTimeout(() => {
+      (mode === "compiler" ? compilerTab : traceTab).focus();
+    }, 0);
+  };
+
+  const cleanupViewer = () => {
+    clearTimers();
+    resetCompiler();
+    stopWorkflow();
+  };
+
+  const closeViewer = () => {
+    if (!viewer.open) return;
+    cleanupViewer();
+    viewer.close();
+  };
+
+  compilerTrigger.addEventListener("click", () => openViewer("compiler", compilerTrigger));
+  specialistTrigger.addEventListener("click", () => openViewer("trace", specialistTrigger));
+  compilerTab.addEventListener("click", () => setViewerMode("compiler"));
+  traceTab.addEventListener("click", () => setViewerMode("trace"));
+  viewerClose.addEventListener("click", closeViewer);
+
+  viewer.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeViewer();
+  });
+  viewer.addEventListener("click", (event) => {
+    if (event.target === viewer) closeViewer();
+  });
+  viewer.addEventListener("close", () => {
+    cleanupViewer();
+    const target = focusReturnTarget;
+    focusReturnTarget = null;
+    if (target?.isConnected) target.focus();
+  });
+  viewer.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeViewer();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(viewer.querySelectorAll(
+      'button:not([disabled]), a[href], iframe, [tabindex]:not([tabindex="-1"])'
+    )).filter((element) => !element.closest("[hidden]"));
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 })();

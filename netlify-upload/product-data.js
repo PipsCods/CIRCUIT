@@ -37,6 +37,90 @@ window.CIRCUIT_PRODUCT_DATA = {
     monthly: 12,
     annual: 1
   },
+  onboarding: {
+    kind: "illustrative_target_integration",
+    disclaimer:
+      "Target client integration for this product demo. No CIRCUIT package or live specialist runtime is shipped by this prototype.",
+    duration_ms: 7000,
+    snippet: [
+      "from circuit import Circuit",
+      "",
+      "circuit = Circuit(",
+      "  orchestrator=agent,",
+      "  mcps=[slack, salesforce, jira]",
+      ")",
+      "",
+      "agent.add_tools(circuit.specialists())"
+    ].join("\n"),
+    phases: [
+      {
+        id: "install",
+        label: "Install",
+        status: "Runtime connected",
+        heading: "Connect CIRCUIT to the agent service.",
+        copy:
+          "Install the illustrative runtime adapter and register the existing MCP endpoints and execution policy.",
+        terminal: [
+          "$ pip install circuit-runtime",
+          "Downloading circuit_runtime-0.1.0",
+          "Installing compiler adapter … 100%",
+          "✓ connected · 3 MCP endpoints registered"
+        ],
+        active_nodes: ["orchestrator"],
+        graph_status: "Runtime connected to the existing orchestrator."
+      },
+      {
+        id: "investigate",
+        label: "Investigate",
+        status: "Surface mapped",
+        heading: "Investigate intent, schemas, and known failures.",
+        copy:
+          "Workflow intent and the Slack, Salesforce, and Jira contracts flow into CIRCUIT before any runtime request is delegated.",
+        terminal: [
+          "→ reading customer escalation intent",
+          "→ tools/list: 47 tools · 312 fields",
+          "→ mapping 5 required actions",
+          "✓ 3 compiler checks ready"
+        ],
+        active_nodes: ["compiler", "mcps"],
+        graph_status: "47 tools and 312 fields mapped to five required actions."
+      },
+      {
+        id: "build",
+        label: "Build specialists",
+        status: "3 contracts ready",
+        heading: "Materialize three tested Gemma specialists.",
+        copy:
+          "CIRCUIT compiles versioned contracts, runs the failure corpus, and exposes the field counts and reliability each specialist earned.",
+        terminal: [
+          "✓ customer-escalation.v12 · 18 fields · 99.2%",
+          "✓ account-lookup.v7 · 12 fields · ready",
+          "✓ incident-ops.v4 · 21 fields · ready",
+          "✓ 3 high-level tools compiled"
+        ],
+        active_nodes: ["compiler", "specialists"],
+        graph_status: "Three versioned Gemma specialists passed their build checks."
+      },
+      {
+        id: "insert",
+        label: "Insert and run",
+        status: "Orchestrator ready",
+        heading: "Insert three high-level tools into the orchestrator.",
+        copy:
+          "The orchestrator keeps planning. CIRCUIT delegates MCP work through compact, tested specialist contracts.",
+        terminal: [
+          "agent.add_tools(circuit.specialists())",
+          "→ customer_escalation()",
+          "→ account_lookup()",
+          "→ incident_operations()",
+          "✓ orchestrator receives 3 tools, not 47"
+        ],
+        active_nodes: ["orchestrator", "specialists", "mcps"],
+        graph_status: "Orchestrator ready with three compiled specialist tools.",
+        show_code: true
+      }
+    ]
+  },
   stages: [
     {
       id: "discover",
