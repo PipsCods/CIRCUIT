@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="A one-screen replay of a real CIRCUIT Gemma workflow.">
+  <title>CIRCUIT — One-screen workflow</title>
+  <link rel="stylesheet" href="./workflow.css?v=embedded-v1">
+</head>
+<body>
+  <main class="pitch">
+    <header class="pitch-header">
+      <div class="brand-block">
+        <a class="brand" href="./index.html" aria-label="Back to the full CIRCUIT demo">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          CIRCUIT
+        </a>
+        <span class="view-label">ONE-SCREEN TRACE</span>
+      </div>
+
+      <div class="question-block">
+        <span>ACTUAL DATASET QUESTION · <b id="question-id">Q03</b></span>
+        <h1 id="question-text">What are the most influential papers on mRNA vaccines? Return 5 with DOIs and citation counts.</h1>
+      </div>
+
+      <div class="run-meta">
+        <span>GEMMA 4</span>
+        <span>TEMP <b id="temperature">0</b></span>
+        <span>SEED <b id="seed">20260725</b></span>
+      </div>
+    </header>
+
+    <section class="run-console" aria-label="Frozen trace replay">
+      <div class="run-state">
+        <i aria-hidden="true"></i>
+        <div>
+          <strong id="run-status" aria-live="polite">FROZEN TRACE READY</strong>
+          <span id="run-detail">Five recorded events · no live model or network call</span>
+        </div>
+      </div>
+      <div class="run-progress" aria-hidden="true"><i id="run-progress"></i></div>
+      <span class="run-clock" id="run-clock">00:00.000</span>
+      <button id="run-button" type="button"><span aria-hidden="true">▶</span> Run trace</button>
+    </section>
+
+    <section class="workflow-board" aria-label="Gemma workflow from context to verified answer">
+      <article class="stage stage-context" data-stage="Compiling engineered context">
+        <header>
+          <span class="stage-number">01</span>
+          <div><small>INPUT</small><h2>Context</h2></div>
+          <b class="stage-state">QUEUED</b>
+        </header>
+        <div class="stage-body">
+          <div class="parameter-drop">
+            <span><b id="naive-parameter-count">43</b> raw</span>
+            <i aria-hidden="true">→</i>
+            <span><b id="engineered-parameter-count">4</b> exposed</span>
+          </div>
+          <div class="parameter-list" id="parameter-list"></div>
+          <div class="context-rules">
+            <span>AND search explained</span>
+            <span>Rank by citations</span>
+            <span>Short-query retry</span>
+            <span>Observed values only</span>
+          </div>
+          <button class="text-button" id="prompt-button" type="button">View exact prompt</button>
+        </div>
+      </article>
+
+      <article class="stage stage-call" data-stage="Gemma calling Alien MCP">
+        <header>
+          <span class="stage-number">02</span>
+          <div><small>GEMMA · TURN 1</small><h2>Tool call</h2></div>
+          <b class="stage-state">QUEUED</b>
+        </header>
+        <div class="stage-body">
+          <code class="tool-name" id="tool-name">openaire_search_research_products</code>
+          <dl class="argument-list" id="argument-list"></dl>
+          <p class="stage-note">One valid call. Two essential search terms.</p>
+        </div>
+      </article>
+
+      <article class="stage stage-evidence" data-stage="OpenAIRE returning evidence">
+        <header>
+          <span class="stage-number">03</span>
+          <div><small>ALIEN OPENAIRE MCP</small><h2>Evidence</h2></div>
+          <b class="stage-state">QUEUED</b>
+        </header>
+        <div class="evidence-stats">
+          <span><b id="results-returned">10</b> returned</span>
+          <span><b id="total-results">22,424</b> matches</span>
+          <span><b>✓</b> cached</span>
+        </div>
+        <ol class="evidence-list" id="evidence-list" aria-label="Five selected OpenAIRE evidence records"></ol>
+      </article>
+
+      <article class="stage stage-output" data-stage="Gemma emitting grounded JSON">
+        <header>
+          <span class="stage-number">04</span>
+          <div><small>GEMMA · TURN 2</small><h2>Final answer</h2></div>
+          <b class="stage-state">QUEUED</b>
+        </header>
+        <p class="answer-copy" id="answer-copy">Five influential papers are identified below with their DOIs and citation counts.</p>
+        <ol class="answer-list" id="answer-list" aria-label="Gemma final citations"></ol>
+        <button class="text-button" id="json-button" type="button">View exact raw JSON</button>
+      </article>
+
+      <article class="stage stage-verify" data-stage="Running deterministic checks">
+        <header>
+          <span class="stage-number">05</span>
+          <div><small>AFTER THE ANSWER</small><h2>Verify</h2></div>
+          <b class="stage-state">QUEUED</b>
+        </header>
+        <div class="verification-list">
+          <span><b>✓</b> Raw JSON</span>
+          <span><b>✓</b> Exact contract</span>
+          <span><b id="grounded-count">5/5</b> Grounded</span>
+          <span><b id="resolved-count">5/5</b> DOI resolves</span>
+          <span><b id="gold-count">5/5</b> Gold recall</span>
+        </div>
+        <div class="run-cost">
+          <span><b id="token-count">3,972</b> tokens</span>
+          <span><b id="run-cost">$0.000580</b> cost</span>
+        </div>
+        <p class="never-shown">Deterministic checks · never shown to Gemma</p>
+      </article>
+    </section>
+
+    <footer class="comparison">
+      <div class="comparison-label">SAME GEMMA · SAME QUESTION</div>
+      <div class="comparison-path comparison-naive">
+        <strong>NAIVE CONTEXT</strong>
+        <span>invalid sort</span><i>→</i><span>retry</span><i>→</i><span>fenced JSON</span>
+        <b id="naive-gold">3/5 gold</b>
+        <em id="naive-tokens">12,179 tokens</em>
+      </div>
+      <div class="comparison-vs">VS</div>
+      <div class="comparison-path comparison-circuit">
+        <strong>CIRCUIT</strong>
+        <span>valid call</span><i>→</i><span>grounded answer</span><i>→</i><span>strict JSON</span>
+        <b id="circuit-gold">5/5 gold</b>
+        <em id="circuit-tokens">3,972 tokens</em>
+      </div>
+    </footer>
+  </main>
+
+  <dialog id="artifact-dialog">
+    <form method="dialog">
+      <header>
+        <div>
+          <span id="dialog-kicker">FROZEN ARTIFACT</span>
+          <h2 id="dialog-title">Exact raw JSON</h2>
+        </div>
+        <button aria-label="Close artifact">×</button>
+      </header>
+      <pre><code id="dialog-content"></code></pre>
+    </form>
+  </dialog>
+
+  <script src="./demo-data.js?v=embedded-v1"></script>
+  <script src="./workflow.js?v=embedded-v1"></script>
+</body>
+</html>
